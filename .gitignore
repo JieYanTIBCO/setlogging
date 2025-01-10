@@ -18,3 +18,10 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.venv/
+venv/
+ENV/
+.env
+.vscode/
+.idea/
+.DS_Store
