@@ -61,13 +61,18 @@ setlogging/
 ```
 
 ## Configuration Options
-```
-log_level: Logging level (default: DEBUG)
-log_file: Log file path
-max_bytes: Max file size before rotation (25MB)
-backup_count: Number of backup files (7)
-console_output: Enable console logging (True)
-json_format: Enable JSON formatting (False)
-indent: JSON indentation level (None)
-```
+
+| Option         | Type   | Default    | Description                          |
+|----------------|--------|------------|--------------------------------------|
+| log_level      | int    | DEBUG      | Logging level                        |
+| log_file       | str    | None       | Log file path                        |
+| max_bytes      | int    | 25MB       | Max file size before rotation        |
+| backup_count   | int    | 7          | Number of backup files               |
+| console_output | bool   | True       | Enable console logging               |
+| log_format     | str    | None       | Custom log format string             |
+| date_format    | str    | None       | Custom date format string            |
+| json_format    | bool   | False      | Enable JSON formatting               |
+| indent         | int    | None       | JSON indentation level               |
+
+
 
