@@ -52,12 +52,12 @@ class TimezoneFormatter(logging.Formatter):
 def setup_logging(
     log_level: int = logging.DEBUG,
     log_file: Optional[str] = None,
-    max_bytes: int = 25 * 1024 * 1024,  # 25MB
+    max_size_mb: int = 25,  # 25MB
     backup_count: int = 7,
     console_output: bool = True,
     log_format: Optional[str] = None,
     date_format: Optional[str] = None,
-    json_format: bool = False,  # Default is False
+    json_format: bool = False,
     indent: Optional[int] = None
 ) -> logging.Logger:
     """
@@ -66,7 +66,7 @@ def setup_logging(
     Args:
         log_level: Logging level (default: DEBUG)
         log_file: Log file path (default: application.log or application_log.json if json_format is True)
-        max_bytes: Max log file size before rotation (default: 25MB)
+        max_size_mb: Max log file size in MB before rotation (default: 25MB)
         backup_count: Number of backup files to keep (default: 7)
         console_output: Enable console logging (default: True)
         log_format: Custom log format string (optional)
@@ -76,13 +76,16 @@ def setup_logging(
     """
     try:
         # Parameter validation
-        if max_bytes <= 0:
-            raise ValueError("max_bytes must be positive")
+        if max_size_mb <= 0:
+            raise ValueError("max_size_mb must be positive")
         if backup_count < 0:
             raise ValueError("backup_count must be non-negative")
         if indent is not None and not json_format:
             raise ValueError(
                 "indent parameter is only valid when json_format is True")
+
+        # Convert max_size_mb to bytes
+        max_bytes = max_size_mb * 1024 * 1024
 
         # Set default log file based on json_format
         if log_file is None:
@@ -134,7 +137,7 @@ def setup_logging(
 ===============================
 Level        : {logging.getLevelName(log_level)}
 Log File     : {file_handler.baseFilename}
-Max File Size: {max_bytes:.2f} MB
+Max File Size: {max_size_mb:.2f} MB
 Backup Count : {backup_count}
 Console Out  : {console_output}
 Timezone     : {datetime.now().astimezone().tzinfo}
@@ -152,12 +155,12 @@ def get_logger(
     name: str = __name__,
     log_level: int = logging.DEBUG,
     log_file: Optional[str] = None,
-    max_bytes: int = 25 * 1024 * 1024,  # 25MB
+    max_size_mb: int = 25,  # 25MB
     backup_count: int = 7,
     console_output: bool = True,
     log_format: Optional[str] = None,
     date_format: Optional[str] = None,
-    json_format: bool = False,  # Default is False
+    json_format: bool = False,
     indent: Optional[int] = None
 ) -> logging.Logger:
     """
@@ -167,7 +170,7 @@ def get_logger(
         name: Name of the logger.
         log_level: Logging level.
         log_file: Log file name.
-        max_bytes: Max size of log file before rotation.
+        max_size_mb: Max size of log file in MB before rotation.
         backup_count: Number of rotated backups to keep.
         console_output: Enable console logging (default: True)
         log_format: Custom log format string (optional)
@@ -181,7 +184,7 @@ def get_logger(
     return setup_logging(
         log_level=log_level,
         log_file=log_file,
-        max_bytes=max_bytes,
+        max_size_mb=max_size_mb,  # Pass max_size_mb parameter
         backup_count=backup_count,
         console_output=console_output,
         log_format=log_format,
@@ -194,7 +197,7 @@ def get_logger(
 # Example Usage
 if __name__ == "__main__":
     try:
-        logger = setup_logging(console_output=True)
+        logger = get_logger(console_output=True)
         logger.info("Basic usage example")
 
         # JSON format example

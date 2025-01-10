@@ -41,7 +41,13 @@ logger.info("Structured logging")
 # Custom file and rotation
 logger = get_logger(
     log_file="/tmp/app.log",
-    max_bytes=10*1024*1024,  # 10MB
+    max_size_mb=10,  # 10MB
+    backup_count=5
+)
+
+# Disable console output
+logger = get_logger(console_output=False)
+logger.info("This will not be printed to the console")
 ```
 
 ## Project Structure
@@ -62,17 +68,17 @@ setlogging/
 
 ## Configuration Options
 
-| Option         | Type   | Default    | Description                          |
-|----------------|--------|------------|--------------------------------------|
-| log_level      | int    | DEBUG      | Logging level                        |
-| log_file       | str    | None       | Log file path                        |
-| max_bytes      | int    | 25MB       | Max file size before rotation        |
-| backup_count   | int    | 7          | Number of backup files               |
-| console_output | bool   | True       | Enable console logging               |
-| log_format     | str    | None       | Custom log format string             |
-| date_format    | str    | None       | Custom date format string            |
-| json_format    | bool   | False      | Enable JSON formatting               |
-| indent         | int    | None       | JSON indentation level               |
+| Option          | Type    | Default                        | Description                             |
+|-----------------|---------|--------------------------------|-----------------------------------------|
+| `log_level`     | int     | `DEBUG`                        | Logging level                           |
+| `log_file`      | str     | `application.log` or `application_log.json` | Log file path                           |
+| `max_size_mb`   | int     | `25`                           | Max file size in MB before rotation     |
+| `backup_count`  | int     | `7`                            | Number of backup files                  |
+| `console_output`| bool    | `True`                         | Enable console logging                  |
+| `log_format`    | str     | `None`                         | Custom log format string                |
+| `date_format`   | str     | `None`                         | Custom date format string               |
+| `json_format`   | bool    | `False`                        | Enable JSON formatting                  |
+| `indent`        | int     | `None`                         | JSON indentation level                  |
 
 
 

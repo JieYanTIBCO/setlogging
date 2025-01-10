@@ -57,17 +57,17 @@ def test_timezone_awareness():
 def test_file_rotation(tmp_path):
     """Test log file rotation"""
     log_file = tmp_path / "rotate.log"
-    max_bytes = 100
+    max_size_mb = 1  # 1MB
     backup_count = 3
     logger = get_logger(
         log_file=str(log_file),
-        max_bytes=max_bytes,
+        max_size_mb=max_size_mb,
         backup_count=backup_count
     )
 
     # Write enough data to trigger rotation
-    for i in range(10):
-        logger.info("x" * 20)
+    for i in range(100):
+        logger.info("x" * 1024 * 10)  # 10KB per log entry
 
     assert os.path.exists(log_file)
     assert os.path.exists(f"{log_file}.1")
@@ -76,7 +76,7 @@ def test_file_rotation(tmp_path):
 def test_invalid_parameters():
     """Test error handling for invalid parameters"""
     with pytest.raises(ValueError):
-        get_logger(max_bytes=-1)
+        get_logger(max_size_mb=-1)
 
     with pytest.raises(ValueError):
         get_logger(backup_count=-1)
@@ -87,7 +87,7 @@ def test_invalid_parameters():
 
 def test_console_output(capsys):
     """Test console output"""
-    logger = get_logger()
+    logger = get_logger(console_output=True)
     test_message = "Test console output"
     logger.info(test_message)
     captured = capsys.readouterr()
@@ -160,6 +160,41 @@ def test_log_level_configuration():
         # Warning should log
         logger.warning("Warning message")
         assert len(capture.records) == 1
+
+
+def test_custom_date_format(tmp_path):
+    """Test custom date format"""
+    log_file = tmp_path / "date_format.log"
+    date_format = "%Y-%m-%d"
+    logger = get_logger(
+        log_file=str(log_file),
+        date_format=date_format
+    )
+    logger.info("Test message")
+
+    with open(log_file) as f:
+        content = f.read()
+        assert datetime.now().strftime(date_format) in content
+
+
+def test_custom_log_format():
+    """Test custom log format"""
+    custom_format = "%(levelname)s - %(message)s"
+    logger = get_logger(log_format=custom_format)
+
+    with LogCapture() as capture:
+        logger.info("Test message")
+        assert "INFO - Test message" in str(capture.records[0])
+
+
+def test_multiple_handlers():
+    """Test multiple handlers configuration"""
+    logger = get_logger(console_output=True)
+    assert len(logger.handlers) >= 2  # File and console handlers
+
+    handler_types = [type(h) for h in logger.handlers]
+    assert logging.StreamHandler in handler_types
+    assert logging.FileHandler in handler_types
 
 
 @pytest.fixture(autouse=True)
