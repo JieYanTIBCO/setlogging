@@ -27,4 +27,4 @@ ENV/
 .DS_Store
 *.log
 *.log.*
-application_log.json
+*log.json
