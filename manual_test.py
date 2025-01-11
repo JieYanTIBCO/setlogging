@@ -14,7 +14,7 @@ def main():
     # 测试非 JSON 格式日志
     print("Testing non-JSON logger...")
     logger = get_logger(
-        log_level=logging.NOTSET,  # 设置日志级别
+        log_level=logging.CRITICAL,  # 设置日志级别
         log_file="application.log",  # 日志文件路径
         max_size_mb=1,  # 日志文件最大大小（1MB）
         backup_count=3,  # 保留的备份文件数量

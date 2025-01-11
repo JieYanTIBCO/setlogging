@@ -131,7 +131,7 @@ def setup_logging(
 
         # Log configuration details
         processID = os.getpid()
-        logger.info(f"""
+        config_message = f"""
 ===============================
     Logging Configuration
 ===============================
@@ -143,7 +143,13 @@ Console Out  : {console_output}
 Timezone     : {datetime.now().astimezone().tzinfo}
 ProcessID    : {processID}
 ===============================
-""")
+"""
+        # Log configuration details
+        if log_level != 0:
+            logger.log(log_level, config_message)
+
+        else:
+            logger.warning(config_message)
 
         return logger
 
