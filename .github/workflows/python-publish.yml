@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: "3.9" # Specify the Python version for this job
 
-      - name: Install dependencies # Step to install project dependencies
+      - name: Install Python dependencies # Install Python project dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -33,7 +33,23 @@ jobs:
       - name: Run pytest # Run automated tests using pytest and exclude manual_test.py
         run: pytest -v --cov=src/setlogging tests/ --ignore=tests/manual_test.py
 
-      - name: Build package # Build the Python package for distribution
+      - name: Set up Node.js for Semantic-Release # Configure Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16" # Use a compatible Node.js version
+
+      - name: Install Semantic-Release dependencies # Install Semantic-Release and plugins
+        run: npm install
+
+      - name: Semantic-Release Dry Run # Determine the version without creating a release
+        run: npx semantic-release --dry-run
+      
+      - name: Run Semantic-Release # Determine version and create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub token for creating releases
+        run: npx semantic-release
+
+      - name: Build Python package # Build the Python package for distribution
         run: |
           python setup.py sdist bdist_wheel
           ls dist/  # Check the package files
@@ -41,8 +57,8 @@ jobs:
       - name: Publish to PyPI # Publish to PyPI if on the main branch
         if: github.ref == 'refs/heads/main' # Ensure this runs only on main branch
         env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }} # PyPI username from secrets
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }} # PyPI password or token from secrets
+          TWINE_USERNAME: "__token__" # Use the literal string "__token__" for API authentication
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }} # Securely pass the PyPI API token from GitHub Secrets
         run: |
           python -m pip install --upgrade twine
           twine upload dist/*
