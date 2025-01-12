@@ -1,8 +1,11 @@
+# Python-related files
 __pycache__/
 *.py[cod]
 *.class
 *.so
 .Python
+
+# Build artifacts
 build/
 develop-eggs/
 dist/
@@ -18,14 +21,24 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Virtual environment folders
 .venv/
 venv/
 ENV/
 .env
+
+# Editor/IDE configurations
 .vscode/
 .idea/
+
+# macOS metadata
 .DS_Store
+
+# Logs
 *.log
 *.log.*
 *log.json*
+
+# Node.js
 node_modules/
