@@ -28,4 +28,3 @@ ENV/
 *.log
 *.log.*
 *log.json*
-manual_test.py
