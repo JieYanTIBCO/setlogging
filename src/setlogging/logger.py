@@ -154,8 +154,10 @@ def setup_logging(
                 logger.warning({"Logging Configuration": config_dict})
         else:
             if log_level != 0:
-                logger.log(log_level, f"Logging Configuration:\n{
-                           config_message}")
+                logger.log(log_level, (
+                    f"Logging Configuration:\n"
+                    f"{config_message}"
+                ))
             else:
                 logger.warning(f"Logging Configuration:\n{config_message}")
 
