@@ -3,7 +3,7 @@ import json
 import os
 import logging
 from datetime import datetime
-from setlogging import get_logger, setup_logging, TimezoneFormatter
+from setlogging.logger import get_logger, setup_logging, TimezoneFormatter
 
 
 class LogCapture:

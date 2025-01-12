@@ -35,9 +35,14 @@ jobs:
 
       - name: Install the setlogging package # Install your module
         run: pip install -e .
+      
+      - name: Set PYTHONPATH # Set the PYTHONPATH environment variable
+        run: echo "PYTHONPATH=src" >> $GITHUB_ENV
+
 
       - name: Run pytest # Run automated tests using pytest and exclude manual_test.py
         run: pytest -v --cov=src/setlogging tests/ --ignore=tests/manual_test.py
+        working-directory: ${{github.workspace}}
 
       - name: Set up Node.js for Semantic-Release # Configure Node.js environment
         uses: actions/setup-node@v3
