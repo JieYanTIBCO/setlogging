@@ -39,6 +39,9 @@ jobs:
       - name: Set PYTHONPATH # Set the PYTHONPATH environment variable
         run: echo "PYTHONPATH=src" >> $GITHUB_ENV
 
+      - name: Verify setlogging installation
+        run: python -c "import setlogging; print(setlogging.__file__)"
+
 
       - name: Run pytest # Run automated tests using pytest and exclude manual_test.py
         run: pytest -v --cov=src/setlogging tests/ --ignore=tests/manual_test.py
