@@ -71,7 +71,7 @@ setlogging/
 | Option          | Type    | Default                        | Description                             |
 |-----------------|---------|--------------------------------|-----------------------------------------|
 | `log_level`     | int     | `DEBUG`                        | Logging level                           |
-| `log_file`      | str     | `application.log`              | Log file path                           |
+| `log_file`      | str     | `app.log` or `app_json.log`    | Log file path                           |
 | `max_size_mb`   | int     | `25`                           | Max file size in MB before rotation     |
 | `backup_count`  | int     | `7`                            | Number of backup files                  |
 | `console_output`| bool    | `True`                         | Enable console logging                  |

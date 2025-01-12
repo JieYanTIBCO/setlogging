@@ -91,9 +91,9 @@ def setup_logging(
         # Convert max_size_mb to bytes
         max_bytes = max_size_mb * 1024 * 1024
 
-        # Set default log file based on json_format
+        # Determine default log file based on json_format
         if log_file is None:
-            log_file = "application.log"
+            log_file = "app_json.log" if json_format else "app.log"
 
         # Create log directory if needed
         log_dir = os.path.dirname(log_file)
