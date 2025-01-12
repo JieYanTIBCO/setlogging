@@ -27,4 +27,5 @@ ENV/
 .DS_Store
 *.log
 *.log.*
-*log.json
+*log.json*
+manual_test.py

@@ -65,7 +65,7 @@ def setup_logging(
 
     Args:
         log_level: Logging level (default: DEBUG)
-        log_file: Log file path (default: application.log or application_log.json if json_format is True)
+        log_file: Log file path (default: application.log)
         max_size_mb: Max log file size in MB before rotation (default: 25MB)
         backup_count: Number of backup files to keep (default: 7)
         console_output: Enable console logging (default: True)
@@ -83,13 +83,17 @@ def setup_logging(
         if indent is not None and not json_format:
             raise ValueError(
                 "indent parameter is only valid when json_format is True")
+    except Exception as e:
+        raise
+
+    try:
 
         # Convert max_size_mb to bytes
         max_bytes = max_size_mb * 1024 * 1024
 
         # Set default log file based on json_format
         if log_file is None:
-            log_file = "application_log.json" if json_format else "application.log"
+            log_file = "application.log"
 
         # Create log directory if needed
         log_dir = os.path.dirname(log_file)
@@ -129,9 +133,54 @@ def setup_logging(
             console_handler.setFormatter(formatter)
             logger.addHandler(console_handler)
 
-        # Log configuration details
-        processID = os.getpid()
-        config_message = f"""
+        # Generate configuration details using get_config_message
+        config_message = get_config_message(
+            log_level=log_level,
+            file_handler=file_handler,
+            max_size_mb=max_size_mb,
+            backup_count=backup_count,
+            console_output=console_output,
+            json_format=json_format,  # Adapt the format based on user preference
+            indent=indent
+        )
+
+        # Log configuration details with respect to log_level
+        if json_format:
+            # Parse JSON as dictionary
+            config_dict = json.loads(config_message)
+            if log_level != 0:
+                logger.log(log_level, {"Logging Configuration": config_dict})
+            else:
+                logger.warning({"Logging Configuration": config_dict})
+        else:
+            if log_level != 0:
+                logger.log(log_level, f"Logging Configuration:\n{
+                           config_message}")
+            else:
+                logger.warning(f"Logging Configuration:\n{config_message}")
+
+        return logger
+
+    except Exception as e:
+        raise RuntimeError(f"Failed to set up logging: {str(e)}") from e
+
+
+def get_config_message(log_level, file_handler, max_size_mb, backup_count, console_output, json_format=False, indent=None):
+    processID = os.getpid()
+
+    if json_format:
+        config_dict = {
+            "Level": logging.getLevelName(log_level),
+            "LogFile": file_handler.baseFilename,
+            "MaxFileSizeMB": max_size_mb,
+            "BackupCount": backup_count,
+            "ConsoleOutput": console_output,
+            "Timezone": str(datetime.now().astimezone().tzinfo),
+            "ProcessID": processID
+        }
+        return json.dumps(config_dict)
+    else:
+        return f"""
 ===============================
     Logging Configuration
 ===============================
@@ -144,17 +193,6 @@ Timezone     : {datetime.now().astimezone().tzinfo}
 ProcessID    : {processID}
 ===============================
 """
-        # Log configuration details
-        if log_level != 0:
-            logger.log(log_level, config_message)
-
-        else:
-            logger.warning(config_message)
-
-        return logger
-
-    except Exception as e:
-        raise RuntimeError(f"Failed to setup logging: {str(e)}") from e
 
 
 def get_logger(
