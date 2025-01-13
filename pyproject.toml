@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "setlogging"
-version = "0.2.0"
+version = "0..0"
 description = "A flexible logging utility with JSON support and timezone awareness"
 authors = [
     { name = "Jie Yan", email = "kiki3890528@gmail.com" }
@@ -16,22 +16,19 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = []
+dependencies = []  # Add runtime dependencies here, if any
+
+# Specify your package source structure
+packages = [{ include = "setlogging", from = "src" }]
 
 [project.urls]
 Homepage = "https://github.com/JieYanTIBCO/setlogging"
-
-[tool.hatch.build]
-# Provide a list of string paths for packages, rather than dictionaries
-packages = [
-  "src/setlogging"
-]
 
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.build.targets.sdist]
-# Include necessary files for the source distribution
+# Include all files required for source distribution
 include = [
     "src/setlogging/**",
     "README.md",
@@ -39,7 +36,7 @@ include = [
 ]
 
 [tool.hatch.build.targets.wheel]
-# Include necessary files for the wheel
+# Include metadata for wheel
 include = [
     "src/setlogging/**",
     "README.md",
