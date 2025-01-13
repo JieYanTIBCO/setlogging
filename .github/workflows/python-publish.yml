@@ -17,6 +17,13 @@ jobs:
     runs-on: ubuntu-latest # Use the latest Ubuntu runner environment
     permissions:
       contents: write
+    
+    env: # Define global environment variables for the job
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }} # Token for GitHub API authentication
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}       # Token for npm registry authentication
+      TWINE_USERNAME: "__token__"               # Use literal string "__token__" for PyPI
+      TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }} # Token for PyPI authentication
+
 
     steps:
       - name: Checkout code # Step to pull the latest repository code
@@ -57,8 +64,6 @@ jobs:
         run: npx semantic-release --dry-run
       
       - name: Run Semantic-Release # Determine version and create GitHub release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub token for creating releases
         run: npx semantic-release
 
       - name: Build Python package # Build the Python package for distribution
