@@ -35,7 +35,7 @@ jobs:
           python-version: "3.9" # Specify the Python version for this job
 
       - name: Upgrade Hatchling # Ensure Hatchling is up-to-date
-        run: pip install --upgrade hatchling
+        run: pip install --upgrade hatchling pip setuptools wheel
 
       - name: Install Python dependencies # Install Python project dependencies
         run: |
