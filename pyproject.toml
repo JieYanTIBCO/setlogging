@@ -22,14 +22,16 @@ dependencies = []
 Homepage = "https://github.com/JieYanTIBCO/setlogging"
 
 [tool.hatch.build]
+# Provide a list of string paths for packages, rather than dictionaries
 packages = [
-  { include = "setlogging", from = "src" }
+  "src/setlogging"
 ]
 
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.build.targets.sdist]
+# Include necessary files for the source distribution
 include = [
     "src/setlogging/**",
     "README.md",
@@ -37,6 +39,7 @@ include = [
 ]
 
 [tool.hatch.build.targets.wheel]
+# Include necessary files for the wheel
 include = [
     "src/setlogging/**",
     "README.md",
