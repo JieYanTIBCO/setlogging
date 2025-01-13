@@ -1,3 +1,16 @@
+# [0.2.0](https://github.com/JieYanTIBCO/setlogging/compare/v0.1.1...v0.2.0) (2025-01-13)
+
+
+### Features
+
+* add advanced JSON logging ([6bdadfa](https://github.com/JieYanTIBCO/setlogging/commit/6bdadfa1054785239ecbf38a6fbcb6741ab931fa))
+
+
+### Reverts
+
+* Update pyproject.toml ([e5e1635](https://github.com/JieYanTIBCO/setlogging/commit/e5e163521035f19ea12dca1ed0c19beaed67ed14))
+* Update pyproject.toml ([c5506cf](https://github.com/JieYanTIBCO/setlogging/commit/c5506cf2b09f2c39f228b961a9c6883e47dd25ff))
+
 ## [0.1.1](https://github.com/JieYanTIBCO/setlogging/compare/v0.1.0...v0.1.1) (2025-01-13)
 
 
