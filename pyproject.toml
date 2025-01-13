@@ -16,19 +16,20 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = []  # Add runtime dependencies here, if any
-
-# Specify your package source structure
-packages = [{ include = "setlogging", from = "src" }]
+dependencies = []
 
 [project.urls]
 Homepage = "https://github.com/JieYanTIBCO/setlogging"
+
+[tool.hatch.build]
+packages = [
+  { include = "setlogging", from = "src" }
+]
 
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.build.targets.sdist]
-# Include all files required for source distribution
 include = [
     "src/setlogging/**",
     "README.md",
@@ -36,7 +37,6 @@ include = [
 ]
 
 [tool.hatch.build.targets.wheel]
-# Include metadata for wheel
 include = [
     "src/setlogging/**",
     "README.md",
