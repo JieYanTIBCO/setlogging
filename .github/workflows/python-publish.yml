@@ -1,7 +1,13 @@
 name: Python CI/CD Workflow
 
 on:
-  workflow_dispatch:
+  push:             # Run on every push
+    branches:
+      - main        # Only on the main branch
+  pull_request:     # (Optional) Run on PRs targeting main
+    branches:
+      - main
+  workflow_dispatch: # Always allow manual triggering
 
 jobs:
   test-and-publish:
