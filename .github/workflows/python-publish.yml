@@ -61,7 +61,7 @@ jobs:
         run: npm install
 
       - name: Semantic-Release Dry Run # Determine the version without creating a release
-        run: npx semantic-release --dry-run
+        run: npx semantic-release --dry-run --no-ci
       
       - name: Run Semantic-Release # Determine version and create GitHub release
         run: npx semantic-release
