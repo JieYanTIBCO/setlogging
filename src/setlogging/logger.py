@@ -244,6 +244,7 @@ def get_logger(
 if __name__ == "__main__":
     try:
         logger = get_logger(console_output=True)
+        logger.debug("Basic debug example")
         logger.info("Basic usage example")
 
         # JSON format example
