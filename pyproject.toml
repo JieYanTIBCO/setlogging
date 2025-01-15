@@ -22,7 +22,7 @@ dependencies = []  # Add runtime dependencies here, if any
 Homepage = "https://github.com/JieYanTIBCO/setlogging"
 
 [tool.hatch.metadata]
-package-dir = { "" = "src/setlogging" }
+package-dir = { "setlogging" = "src/setlogging" }
 
 
 [tool.hatch.build.targets.sdist]
