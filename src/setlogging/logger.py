@@ -65,7 +65,7 @@ def setup_logging(
 
     Args:
         log_level: Logging level (default: DEBUG)
-        log_file: Log file path (default: application.log)
+        log_file: Log file path (default: app.log or app_json.log if json_format is True)
         max_size_mb: Max log file size in MB before rotation (default: 25MB)
         backup_count: Number of backup files to keep (default: 7)
         console_output: Enable console logging (default: True)
@@ -244,6 +244,7 @@ def get_logger(
 if __name__ == "__main__":
     try:
         logger = get_logger(console_output=True)
+        logger.debug("Basic debug example")
         logger.info("Basic usage example")
 
         # JSON format example
