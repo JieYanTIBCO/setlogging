@@ -22,22 +22,23 @@ dependencies = []  # Add runtime dependencies here, if any
 Homepage = "https://github.com/JieYanTIBCO/setlogging"
 
 [tool.hatch.metadata]
-package-dir = { "" = "src" }
+package-dir = { "setlogging" = "src/setlogging" }
 allow-direct-references = true
 
 [tool.hatch.build.targets.sdist]
-include = [
-    "src/setlogging/**",
-    "README.md",
-    "LICENSE",
-]
+# include = [
+#     "src/setlogging/**",
+#     "README.md",
+#     "LICENSE",
+# ]
 
 [tool.hatch.build.targets.wheel]
-include = [
-    "src/setlogging/**",
-    "README.md",
-    "LICENSE",
-]
+# include = [
+#     "src/setlogging/**",
+#     "README.md",
+#     "LICENSE",
+# ]
+
 
 [tool.hatch.version]
 path = "src/setlogging/__init__.py"
