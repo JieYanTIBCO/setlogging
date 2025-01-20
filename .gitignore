@@ -42,3 +42,6 @@ ENV/
 
 # Node.js
 node_modules/
+
+# powershell script
+*.ps1
