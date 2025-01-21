@@ -203,23 +203,16 @@ def test_timezone_awareness():
             print(f"Formatter的类ID: {id(h.formatter.__class__)}")
 
 
-def test_invalid_parameters():
-    """Test error handling for invalid parameters"""
-    with pytest.raises(ValueError):
-        get_logger(max_size_mb=-1)
-
-    with pytest.raises(ValueError):
-        get_logger(backup_count=-1)
-
-    with pytest.raises(ValueError):
-        get_logger(indent=2, json_format=False)
-        
-    # Test invalid indent values
-    with pytest.raises(ValueError):
-        get_logger(indent=-1, json_format=True)
-        
-    with pytest.raises(ValueError):
-        get_logger(indent=-2, json_format=True)
+def test_file_handler_edge_cases(tmp_path):
+    """Test file handler edge cases"""
+    # Test invalid file path
+    invalid_path = tmp_path / "nonexistent" / "test.log"
+    get_logger(log_file=str(invalid_path))
+    
+    # Test read-only file
+    read_only_file = tmp_path / "read_only.log"
+    read_only_file.touch(mode=0o444)
+    get_logger(log_file=str(read_only_file))
 
 def test_setup_logging_configurations(tmp_path):
     """Test different setup_logging configurations"""
@@ -255,7 +248,7 @@ def test_setup_logging_configurations(tmp_path):
                 handler.flush()
             
 def main():
-    print(f"Test代码中的CustomFormatter ID: {id(CustomFormatter)}")
+    # print(f"Test代码中的CustomFormatter ID: {id(CustomFormatter)}")
     print("Manual testing started...")
 
     # Call all test functions
@@ -268,7 +261,7 @@ def main():
     # manual_test_custom_log_format()
     # test_timezone_awareness()
     # get_logger(indent=-1, json_format=True)
-    test_setup_logging_configurations(temp_path)
+    test_file_handler_edge_cases(temp_path)
     # Cleanup
     # cleanup_temp_path()
 

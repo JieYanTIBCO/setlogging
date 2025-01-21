@@ -99,34 +99,47 @@ def setup_logging(
         json_format: Flag to determine if log format should be JSON (default: False)
         indent: Indentation level for JSON output (default: None)
     """
-    try:
-        # Parameter validation
-        if max_size_mb <= 0:
-            raise ValueError("max_size_mb must be positive")
-        if backup_count < 0:
-            raise ValueError("backup_count must be non-negative")
-        if indent is not None and indent < 0:
+    if max_size_mb <= 0:
+        raise ValueError("max_size_mb must be positive")
+    if backup_count < 0:
+        raise ValueError("backup_count must be non-negative")
+    if indent is not None:
+        if indent < 0:
             raise ValueError("indent must be non-negative")
-        if indent is not None and not json_format:
-            raise ValueError(
-                "indent parameter is only valid when json_format is True")
-    except Exception as e:
-        raise
+        if not json_format:
+            raise ValueError("indent parameter is only valid when json_format is True")
 
     try:
-
-        # Convert max_size_mb to bytes
+        # Calculate max file size in bytes
         max_bytes = max_size_mb * 1024 * 1024
 
-        # Determine default log file based on json_format
-        if log_file is None:
-            log_file = "app_json.log" if json_format else "app.log"
+        # Set default log file if not provided
+        log_file = log_file or ("app_json.log" if json_format else "app.log")
 
-        # Create log directory if needed
+        # Create log directory if it does not exist
         log_dir = os.path.dirname(log_file)
-        if log_dir and not os.path.exists(log_dir):
-            os.makedirs(log_dir)
+        if log_dir:  # If log_dir is not empty
+            os.makedirs(log_dir, exist_ok=True)  # Create directory if it does not exist
 
+            # check if the directory is writable
+            test_file = os.path.join(log_dir, ".permission_test")
+            try:
+                with open(test_file, "w") as f:
+                    f.write("test")
+                os.remove(test_file)
+            except IOError as e:
+                raise PermissionError(f"Directory not writable: {log_dir}") from e
+
+        # Check if log file is writable
+        if os.path.exists(log_file):
+            if not os.access(log_file, os.W_OK):
+                raise PermissionError(f"File not writable: {log_file}")
+
+    except OSError as e:  # Catch permission errors
+        raise
+    
+    
+    try:
         # Create logger
         logger = logging.getLogger(__name__)
         logger.setLevel(log_level)
