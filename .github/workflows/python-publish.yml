@@ -28,6 +28,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.9"
+
+      - name: Clean build artifacts
+        run: |
+          rm -rf dist/  # 清除旧构建产物
+          rm -rf .cache/  # 清除 Hatch 缓存
       
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=src" >> $GITHUB_ENV

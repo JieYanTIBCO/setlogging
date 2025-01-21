@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "setlogging"
-version = "0.2.1"
+version = "0.3.0"
 description = "A flexible logging utility with JSON support and timezone awareness"
 authors = [
     { name = "Jie Yan", email = "kiki3890528@gmail.com" }
