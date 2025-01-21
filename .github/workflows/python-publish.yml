@@ -35,7 +35,7 @@ jobs:
         run: |
           rm -rf dist/  # Clean up the dist directory
           rm -rf .cache/ # Clean up the cache directory
-          find . -path './src/setlogging/__pycache__' -prune -o -print | xargs rm -rf # Clean up the __pycache__ directories
+          find . -type d -name '__pycache__' -exec rm -rf {} +
       
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=src" >> $GITHUB_ENV
