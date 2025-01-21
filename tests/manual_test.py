@@ -279,10 +279,6 @@ def main():
     # test_file_handler_edge_cases(temp_path)
     #get_logger(date_format="INVALID_FORMAT")
     log_format="INVALID_FORMAT"
-    try:
-        formatter = logging.Formatter(log_format=log_format)
-    except (KeyError, ValueError) as e:
-        raise ValueError(f"Invalid log_format: {log_format}. Error: {str(e)}")
     # Cleanup
     # cleanup_temp_path()
 
