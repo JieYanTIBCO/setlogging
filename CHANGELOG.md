@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/JieYanTIBCO/setlogging/compare/v0.2.0...v0.2.1) (2025-01-21)
+
+
+### Bug Fixes
+
+* timezone and ms in log ([4865490](https://github.com/JieYanTIBCO/setlogging/commit/4865490b69bf952a7bbc8ebb20ae3033ccf95190))
+
 # [0.2.0](https://github.com/JieYanTIBCO/setlogging/compare/v0.1.1...v0.2.0) (2025-01-13)
 
 
