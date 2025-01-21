@@ -291,9 +291,10 @@ def test_get_config_message():
 def test_setup_logging_configurations(tmp_path):
     """Test different setup_logging configurations"""
     # Test basic setup
+    
     log_file = tmp_path / "basic.log"
     setup_logging(log_file=str(log_file))
-    logger = logging.getLogger()
+    logger = get_logger()
     logger.info("Basic setup test")
     assert log_file.exists()
     
@@ -340,14 +341,14 @@ def test_setup_logging_configurations(tmp_path):
         max_size_mb=1,  # 1MB rotation threshold
         backup_count=3
     )
-    
+    logger.info("Rotation test start: \n ======================")
     # Write enough data to trigger rotation (1.5MB total)
     for i in range(150):
         logger.info(f"Rotation test {i}: " + "x" * 1024 * 10)  # 10KB per log entry
         # Explicitly flush after each write to ensure rotation happens
         for handler in logger.handlers:
             if isinstance(handler, logging.FileHandler):
-                handler.flush()
+                handler.close()  # 显式关闭处理器以确保轮转完成
 
     # Verify rotation occurred
     assert os.path.exists(rotate_file), "Original log file should exist"

@@ -4,7 +4,7 @@ from pathlib import Path
 from setlogging.logger import get_logger
 import json
 import logging
-from setlogging.logger import CustomFormatter
+from setlogging.logger import CustomFormatter,setup_logging
 
 
 
@@ -220,6 +220,39 @@ def test_invalid_parameters():
         
     with pytest.raises(ValueError):
         get_logger(indent=-2, json_format=True)
+
+def test_setup_logging_configurations(tmp_path):
+    """Test different setup_logging configurations"""
+    # Test basic setup
+    log_file = tmp_path / "basic.log"
+    setup_logging(log_file=str(log_file))
+    logger = logging.getLogger()
+    logger.info("Basic setup test")
+    assert log_file.exists()
+    
+    # Test JSON format with indentation
+    json_file = tmp_path / "json.log"
+    setup_logging(
+        log_file=str(json_file),
+        json_format=True,
+        indent=4
+    )
+    test_message = "JSON format test"
+    logger.info(test_message)
+
+
+    rotate_file = tmp_path / "rotate.log"
+    setup_logging(
+        log_file=str(rotate_file),
+        max_size_mb=1,  # 1MB rotation threshold
+        backup_count=3
+    )
+    for i in range(150):
+        logger.info(f"Rotation test {i}: " + "x" * 1024 * 10)  # 10KB per log entry
+        # Explicitly flush after each write to ensure rotation happens
+        for handler in logger.handlers:
+            if isinstance(handler, logging.FileHandler):
+                handler.flush()
             
 def main():
     print(f"Test代码中的CustomFormatter ID: {id(CustomFormatter)}")
@@ -234,7 +267,8 @@ def main():
     # manual_test_json_structure()
     # manual_test_custom_log_format()
     # test_timezone_awareness()
-    get_logger(indent=-1, json_format=True)
+    # get_logger(indent=-1, json_format=True)
+    test_setup_logging_configurations(temp_path)
     # Cleanup
     # cleanup_temp_path()
 

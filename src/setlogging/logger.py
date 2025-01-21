@@ -105,6 +105,8 @@ def setup_logging(
             raise ValueError("max_size_mb must be positive")
         if backup_count < 0:
             raise ValueError("backup_count must be non-negative")
+        if indent is not None and indent < 0:
+            raise ValueError("indent must be non-negative")
         if indent is not None and not json_format:
             raise ValueError(
                 "indent parameter is only valid when json_format is True")
