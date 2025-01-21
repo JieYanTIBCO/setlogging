@@ -4,6 +4,9 @@ from pathlib import Path
 from setlogging.logger import get_logger
 import json
 import logging
+from setlogging.logger import CustomFormatter
+
+
 
 # Define a global temp_path for storing log files
 temp_path = Path("/tmp/setlogging")
@@ -175,19 +178,63 @@ def manual_test_custom_log_format():
     logger.info("Test message")
     print(f"Log file for custom log format created: {log_file}")
 
+def test_timezone_awareness():
+    """Test timezone information in logs"""
 
+    # Set up the logger with the CustomFormatter
+    logger = get_logger()  # Or manually set up with CustomFormatter
+
+    # Debugging: Print the types of handlers and their formatters
+    print(f"Logger handlers: {logger.handlers}")
+    for h in logger.handlers:
+        print(f"Handler type: {type(h)}")
+        if hasattr(h, 'formatter'):
+            print(f"Formatter type: {type(h.formatter)}")
+            print(f"Formatter: {h.formatter}")
+            print(f"Formatter class name: {h.formatter.__class__.__name__}")
+            print(f"Formatter module: {h.formatter.__module__}")
+            print(f"Formatter object ID: {id(h.formatter)}")
+            # Check if the formatter is an instance of CustomFormatter
+            validation = isinstance(h.formatter, CustomFormatter)
+            print(f"Is CustomFormatter: {validation}")
+        else:
+            print("No formatter found for this handler.")
+        if hasattr(h, 'formatter'):
+            print(f"Formatter的类ID: {id(h.formatter.__class__)}")
+
+
+def test_invalid_parameters():
+    """Test error handling for invalid parameters"""
+    with pytest.raises(ValueError):
+        get_logger(max_size_mb=-1)
+
+    with pytest.raises(ValueError):
+        get_logger(backup_count=-1)
+
+    with pytest.raises(ValueError):
+        get_logger(indent=2, json_format=False)
+        
+    # Test invalid indent values
+    with pytest.raises(ValueError):
+        get_logger(indent=-1, json_format=True)
+        
+    with pytest.raises(ValueError):
+        get_logger(indent=-2, json_format=True)
+            
 def main():
+    print(f"Test代码中的CustomFormatter ID: {id(CustomFormatter)}")
     print("Manual testing started...")
 
     # Call all test functions
-    test_log_rotation()
-    test_json_indent()
-    test_file_rotation()
-    test_json()
-    test_plain_log()
-    manual_test_json_structure()
-    manual_test_custom_log_format()
-
+    # test_log_rotation()
+    # test_json_indent()
+    # test_file_rotation()
+    # test_json()
+    # test_plain_log()
+    # manual_test_json_structure()
+    # manual_test_custom_log_format()
+    # test_timezone_awareness()
+    get_logger(indent=-1, json_format=True)
     # Cleanup
     # cleanup_temp_path()
 

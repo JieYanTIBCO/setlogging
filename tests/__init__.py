@@ -1,7 +1,7 @@
 # src/setlogging/__init__.py
 
 from setlogging.logger import (
-    TimezoneFormatter,
+    CustomFormatter,
     setup_logging,
     get_logger,
 )
@@ -11,7 +11,7 @@ __author__ = "Jie Yan"
 __email__ = "kiki3890528@gmail.com"
 
 __all__ = [
-    "TimezoneFormatter",
+    "CustomFormatter",
     "setup_logging",
     "get_logger",
 ]

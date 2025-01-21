@@ -4,7 +4,7 @@ import os
 import logging
 import sys
 from datetime import datetime, timedelta
-from setlogging.logger import get_logger, setup_logging, TimezoneFormatter, get_config_message
+from setlogging.logger import get_logger, setup_logging, get_config_message, CustomFormatter
 
 
 class LogCapture:
@@ -62,11 +62,16 @@ def test_json_logging(tmp_path):
 
 def test_timezone_awareness():
     """Test timezone information in logs"""
-    logger = get_logger()
-    formatter = next((h.formatter for h in logger.handlers
-                     if isinstance(h.formatter, TimezoneFormatter)), None)
+    
+    # Set up the logger with the CustomFormatter
+    logger = get_logger()  # Or manually set up with CustomFormatter
+    print(type(logger.handlers))
+    for h in logger.handlers:
+        print(type(h.formatter))
+    formatter = next((h.formatter for h in logger.handlers if isinstance(h.formatter, CustomFormatter)), None)
+    
+    #Assert that the formatter is correctly applied
     assert formatter is not None
-    assert formatter.local_timezone is not None
 
 
 def test_file_rotation(tmp_path):

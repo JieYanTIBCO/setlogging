@@ -6,47 +6,72 @@ from logging.handlers import RotatingFileHandler
 import os
 from typing import Optional, Union
 
+TIMEZONE=datetime.now().astimezone().tzinfo
 
-class TimezoneFormatter(logging.Formatter):
-    """
-    Custom formatter to include timezone-aware timestamps in log messages.
+# class TimezoneFormatter(logging.Formatter):
+#     """
+#     Custom formatter to include timezone-aware timestamps in log messages.
 
-    Args:
-        fmt: The format string for the log message
-        datefmt: The format string for the timestamp
-        timezone: Optional specific timezone to use (defaults to local)
+#     Args:
+#         fmt: The format string for the log message
+#         datefmt: The format string for the timestamp
+#         timezone: Optional specific timezone to use (defaults to local)
 
-    Example:
-        formatter = TimezoneFormatter(
-            fmt='%(asctime)s [%(timezone)s] %(levelname)s: %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
-        )
-    """
+#     Example:
+#         formatter = TimezoneFormatter(
+#             fmt='%(asctime)s [%(timezone)s] %(levelname)s: %(message)s',
+#             datefmt='%Y-%m-%d %H:%M:%S'
+#         )
+#     """
 
-    def __init__(
-        self,
-        fmt: Optional[str] = None,
-        datefmt: Optional[str] = None,
-        timezone: Optional[dt_timezone] = None
-    ) -> None:
-        super().__init__(fmt, datefmt)
-        self.local_timezone = timezone or datetime.now().astimezone().tzinfo
+#     def __init__(
+#         self,
+#         fmt: Optional[str] = None,
+#         datefmt: Optional[str] = None
+#     ) -> None:
+#         super().__init__(fmt, datefmt)
+#         self.local_timezone = TIMEZONE
 
-    def formatTime(self, record: logging.LogRecord, datefmt: Optional[str] = None) -> str:
+#     def formatTime(self, record: logging.LogRecord, datefmt: Optional[str] = None) -> str:
+#         try:
+#             local_dt = datetime.fromtimestamp(
+#                 record.created, self.local_timezone)
+#             if datefmt:
+#                 return local_dt.strftime(datefmt)
+#             else:
+#                 return local_dt.isoformat()
+#         except Exception as e:
+#             raise RuntimeError(f"Failed to format time: {str(e)}") from e
+
+#     def format(self, record: logging.LogRecord) -> str:
+#         # Add timezone name to log record
+#         record.timezone = str(self.local_timezone)
+#         return super().format(record)
+
+
+class CustomFormatter(logging.Formatter):
+    def formatTime(self, record, datefmt):
         try:
-            local_dt = datetime.fromtimestamp(
-                record.created, self.local_timezone)
-            if datefmt:
-                return local_dt.strftime(datefmt)
-            else:
-                return local_dt.isoformat()
+            # Ensure datefmt is not None to avoid string concatenation errors
+            if datefmt is None:
+                datefmt = "%Y-%m-%d %H:%M:%S"  # Default time format
+            
+            # Create a timezone-aware datetime object
+            tz_aware_time = datetime.fromtimestamp(record.created, tz=TIMEZONE)
+            
+            # Format the time with milliseconds
+            formatted_time_with_ms = tz_aware_time.strftime(datefmt + ".%f")
+            formatted_time = formatted_time_with_ms[:-3]  # Truncate to 3 decimal places for milliseconds
+            
+            # Get the timezone abbreviation (e.g., EST)
+            timezone_abbr = tz_aware_time.strftime("%Z")
+            
+            # Combine the formatted time, milliseconds, and timezone
+            return f"{formatted_time} {timezone_abbr}"
+            
         except Exception as e:
-            raise RuntimeError(f"Failed to format time: {str(e)}") from e
-
-    def format(self, record: logging.LogRecord) -> str:
-        # Add timezone name to log record
-        record.timezone = str(self.local_timezone)
-        return super().format(record)
+            # Fallback to the parent class's default time formatting in case of errors
+            return super().formatTime(record, datefmt)
 
 
 def setup_logging(
@@ -116,10 +141,10 @@ def setup_logging(
                 "message": "%(message)s"
             }, indent=indent))
         else:
-            formatter = TimezoneFormatter(
-                fmt=log_format or '%(asctime)s [%(levelname)s] [%(threadName)s] %(message)s',
-                datefmt=date_format or '%Y-%m-%d %H:%M:%S %z'
-            )
+            formatter = CustomFormatter(
+                log_format or "%(asctime)s [%(levelname)s] [%(name)s] %(message)s",
+                date_format or "%Y-%m-%d %H:%M:%S"
+            )   
 
         # Set up file handler
         file_handler = RotatingFileHandler(
@@ -177,7 +202,7 @@ def get_config_message(log_level, file_handler, max_size_mb, backup_count, conso
             "MaxFileSizeMB": max_size_mb,
             "BackupCount": backup_count,
             "ConsoleOutput": console_output,
-            "Timezone": str(datetime.now().astimezone().tzinfo),
+            "Timezone": str(TIMEZONE),
             "ProcessID": processID
         }
         return json.dumps(config_dict)
@@ -191,7 +216,7 @@ Log File     : {file_handler.baseFilename}
 Max File Size: {max_size_mb:.2f} MB
 Backup Count : {backup_count}
 Console Out  : {console_output}
-Timezone     : {datetime.now().astimezone().tzinfo}
+Timezone     : {TIMEZONE}
 ProcessID    : {processID}
 ===============================
 """
@@ -246,10 +271,12 @@ if __name__ == "__main__":
         logger = get_logger(console_output=True)
         logger.debug("Basic debug example")
         logger.info("Basic usage example")
-
+        logger.info(datetime.now().astimezone().tzinfo)
         # JSON format example
         json_logger = get_logger(json_format=True, indent=2)
         json_logger.info("JSON format example")
+
+        
     except Exception as e:
         print(f"Error: {str(e)}")
         raise
