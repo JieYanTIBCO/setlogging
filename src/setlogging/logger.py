@@ -99,17 +99,37 @@ def setup_logging(
         json_format: Flag to determine if log format should be JSON (default: False)
         indent: Indentation level for JSON output (default: None)
     """
-    if max_size_mb <= 0:
-        raise ValueError("max_size_mb must be positive")
-    if backup_count < 0:
-        raise ValueError("backup_count must be non-negative")
-    if indent is not None:
-        if indent < 0:
-            raise ValueError("indent must be non-negative")
-        if not json_format:
-            raise ValueError("indent parameter is only valid when json_format is True")
-
     try:
+        if max_size_mb <= 0:
+            raise ValueError("max_size_mb must be positive")
+        if backup_count < 0:
+            raise ValueError("backup_count must be non-negative")
+        if indent is not None:
+            if indent < 0:
+                raise ValueError("indent must be non-negative")
+            if not json_format:
+                raise ValueError("indent parameter is only valid when json_format is True")
+
+        # Validate log level
+        valid_levels = {
+            logging.DEBUG, logging.INFO, logging.WARNING,
+            logging.ERROR, logging.CRITICAL
+        }
+        if log_level not in valid_levels:
+            raise ValueError(f"Invalid log level: {log_level}. Valid levels are: {valid_levels}")
+        
+        # Validate the date_format
+        if date_format:
+            valid_codes = {"%Y", "%m", "%d", "%H", "%M", "%S", "%z", "%Z"}
+            if not any(code in date_format for code in valid_codes):
+                raise ValueError(f"Invalid date_format: {date_format} must contain at least one format code (e.g., %Y, %m, %H)")
+            
+        # Validate the log_format
+        if log_format:
+            valid_codes = {"%(asctime)s", "%(levelname)s", "%(name)s", "%(message)s"}
+            if not any(code in log_format for code in valid_codes):
+                raise ValueError(f"Invalid log_format: {log_format} must contain at least one format code (e.g., %(asctime)s, %(levelname)s)")
+
         # Calculate max file size in bytes
         max_bytes = max_size_mb * 1024 * 1024
 
@@ -134,8 +154,9 @@ def setup_logging(
         if os.path.exists(log_file):
             if not os.access(log_file, os.W_OK):
                 raise PermissionError(f"File not writable: {log_file}")
+            
 
-    except OSError as e:  # Catch permission errors
+    except Exception as e:  # Catch permission errors
         raise
     
     

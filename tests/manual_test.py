@@ -5,6 +5,7 @@ from setlogging.logger import get_logger
 import json
 import logging
 from setlogging.logger import CustomFormatter,setup_logging
+from datetime import datetime
 
 
 
@@ -246,6 +247,20 @@ def test_setup_logging_configurations(tmp_path):
         for handler in logger.handlers:
             if isinstance(handler, logging.FileHandler):
                 handler.flush()
+
+# def test_parameter_validation():
+#     """Test parameter validation edge cases"""
+#     # Test invalid log level
+#     with pytest.raises(ValueError):
+#         get_logger(log_level=999)  # Invalid log level number
+    
+#     # Test invalid date format
+#     with pytest.raises(ValueError):
+#         get_logger(date_format="INVALID_FORMAT")
+    
+#     # Test invalid log format
+#     with pytest.raises(ValueError):
+#         get_logger(log_format="INVALID_FORMAT")
             
 def main():
     # print(f"Test代码中的CustomFormatter ID: {id(CustomFormatter)}")
@@ -261,7 +276,13 @@ def main():
     # manual_test_custom_log_format()
     # test_timezone_awareness()
     # get_logger(indent=-1, json_format=True)
-    test_file_handler_edge_cases(temp_path)
+    # test_file_handler_edge_cases(temp_path)
+    #get_logger(date_format="INVALID_FORMAT")
+    log_format="INVALID_FORMAT"
+    try:
+        formatter = logging.Formatter(log_format=log_format)
+    except (KeyError, ValueError) as e:
+        raise ValueError(f"Invalid log_format: {log_format}. Error: {str(e)}")
     # Cleanup
     # cleanup_temp_path()
 
