@@ -30,7 +30,8 @@
         {
           "assets": [
             "CHANGELOG.md",
-            "src/setlogging/__init__.py"
+            "src/setlogging/__init__.py",
+            "pyproject.toml"
           ]
         }
       ],
