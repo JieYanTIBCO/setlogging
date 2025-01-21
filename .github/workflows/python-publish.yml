@@ -33,8 +33,7 @@ jobs:
 
       - name: Clean build artifacts
         run: |
-          rm -rf dist/  # Clean up the dist directory
-          rm -rf .cache/ # Clean up the cache directory
+          rm -rf dist/ .cache/ .eggs/ build/
           find . -type d -name '__pycache__' -exec rm -rf {} +
       
       - name: Set PYTHONPATH
