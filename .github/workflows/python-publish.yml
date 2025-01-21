@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      issues: write
+      pull-requests: write
 
     env:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -31,8 +33,9 @@ jobs:
 
       - name: Clean build artifacts
         run: |
-          rm -rf dist/  # 清除旧构建产物
-          rm -rf .cache/  # 清除 Hatch 缓存
+          rm -rf dist/  # Clean up the dist directory
+          rm -rf .cache/ # Clean up the cache directory
+          find . -path './src/setlogging/__pycache__' -prune -o -print | xargs rm -rf # Clean up the __pycache__ directories
       
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=src" >> $GITHUB_ENV
@@ -71,6 +74,8 @@ jobs:
         run: npx semantic-release --dry-run --no-ci
 
       - name: Run Semantic-Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }} 
         run: npx semantic-release
 
       - name: Build Python package
