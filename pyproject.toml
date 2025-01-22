@@ -25,14 +25,14 @@ Homepage = "https://github.com/JieYanTIBCO/setlogging"
 package-dir = { "setlogging" = "src/setlogging" }
 allow-direct-references = true
 
-[tool.hatch.build.targets.sdist]
+#[tool.hatch.build.targets.sdist]
 # include = [
 #     "src/setlogging/**",
 #     "README.md",
 #     "LICENSE",
 # ]
 
-[tool.hatch.build.targets.wheel]
+#[tool.hatch.build.targets.wheel]
 # include = [
 #     "src/setlogging/**",
 #     "README.md",
@@ -42,4 +42,4 @@ allow-direct-references = true
 [tool.hatch.version]
 source = "regex"
 path = "src/setlogging/__init__.py"
-pattern = '__version__\s*=\s*"([^"]+)"'
+pattern = "^__version__\\s*=\\s*['\"](?P<version>[^'\"]+)['\"]"
