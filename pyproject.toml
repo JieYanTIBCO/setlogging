@@ -42,4 +42,4 @@ allow-direct-references = true
 
 [tool.hatch.version]
 path = "src/setlogging/__init__.py"
-pattern = "__version__ = \"{version}\""
+pattern = "^__version__\\s*=\\s*\"{version}\"$"

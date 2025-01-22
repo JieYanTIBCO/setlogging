@@ -6,7 +6,7 @@ from setlogging.logger import (
     get_logger,
 )
 
-__version__ = "0.2.0"
+__version__ = "0.3.2"
 __author__ = "Jie Yan"
 __email__ = "kiki3890528@gmail.com"
 
