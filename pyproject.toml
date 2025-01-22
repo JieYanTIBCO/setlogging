@@ -39,7 +39,7 @@ allow-direct-references = true
 #     "LICENSE",
 # ]
 
-
 [tool.hatch.version]
+source = "regex"
 path = "src/setlogging/__init__.py"
-pattern = "^__version__\\s*=\\s*\"{version}\"$"
+pattern = '__version__\s*=\s*"([^"]+)"'
