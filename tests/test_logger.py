@@ -361,12 +361,10 @@ def test_setup_logging_configurations(tmp_path):
             rotated_size = os.path.getsize(rotated_file)
             assert (
                 rotated_size >= 1024 * 1024 * 0.9
-            ), f"Rotated file {rotated_file} should be at least 90% of 1MB, got {
-                    rotated_size} bytes"
+            ), f"Rotated file {rotated_file} should be at least 90% of 1MB, got {rotated_size} bytes"
             assert (
                 rotated_size <= 1024 * 1024 * 1.1
-            ), f"Rotated file {rotated_file} should be at most 110% of 1MB, got {
-                    rotated_size} bytes"
+            ), f"Rotated file {rotated_file} should be at most 110% of 1MB, got {rotated_size} bytes"
 
     # Verify backup count
     assert (
