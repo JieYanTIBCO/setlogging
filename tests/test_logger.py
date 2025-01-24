@@ -174,8 +174,7 @@ def test_json_indent(tmp_path):
                     # Ensure the leading spaces are a multiple of the specified indent
                     assert leading_spaces % indent == 0, (
                         f"Line '{line.strip()}' has incorrect indentation: "
-                        f"{leading_spaces} spaces (expected multiple of {
-                            indent}). "
+                        f"{leading_spaces} spaces (expected multiple of {indent}). "
                         f"The line number is: {line_number}"
                     )
 
