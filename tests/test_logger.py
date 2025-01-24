@@ -4,7 +4,7 @@ import os
 import logging
 import sys
 from datetime import datetime, timedelta
-from setlogging.logger import get_logger, setup_logging, get_config_message, CustomFormatter
+from setlogging.logger import get_logger, setup_logging, get_config_message, CustomFormatter, get_tz_abbreviation
 
 
 class LogCapture:
@@ -62,15 +62,16 @@ def test_json_logging(tmp_path):
 
 def test_timezone_awareness():
     """Test timezone information in logs"""
-    
+
     # Set up the logger with the CustomFormatter
     logger = get_logger()  # Or manually set up with CustomFormatter
     print(type(logger.handlers))
     for h in logger.handlers:
         print(type(h.formatter))
-    formatter = next((h.formatter for h in logger.handlers if isinstance(h.formatter, CustomFormatter)), None)
-    
-    #Assert that the formatter is correctly applied
+    formatter = next((h.formatter for h in logger.handlers if isinstance(
+        h.formatter, CustomFormatter)), None)
+
+    # Assert that the formatter is correctly applied
     assert formatter is not None
 
 
@@ -114,11 +115,11 @@ def test_invalid_parameters():
 
     with pytest.raises(ValueError):
         get_logger(indent=2, json_format=False)
-        
+
     # Test invalid indent values
     with pytest.raises(ValueError):
         get_logger(indent=-1, json_format=True)
-        
+
     with pytest.raises(ValueError):
         get_logger(indent=-2, json_format=True)
 
@@ -169,7 +170,8 @@ def test_json_indent(tmp_path):
                     # Ensure the leading spaces are a multiple of the specified indent
                     assert leading_spaces % indent == 0, (
                         f"Line '{line.strip()}' has incorrect indentation: "
-                        f"{leading_spaces} spaces (expected multiple of {indent}). "
+                        f"{leading_spaces} spaces (expected multiple of {
+                            indent}). "
                         f"The line number is: {line_number}"
                     )
 
@@ -291,13 +293,13 @@ def test_get_config_message():
 def test_setup_logging_configurations(tmp_path):
     """Test different setup_logging configurations"""
     # Test basic setup
-    
+
     log_file = tmp_path / "basic.log"
     setup_logging(log_file=str(log_file))
     logger = get_logger()
     logger.info("Basic setup test")
     assert log_file.exists()
-    
+
     # Test JSON format with indentation
     json_file = tmp_path / "json.log"
     setup_logging(
@@ -307,7 +309,7 @@ def test_setup_logging_configurations(tmp_path):
     )
     test_message = "JSON format test"
     logger.info(test_message)
-    
+
     # Read and parse all log entries
     with open(json_file) as f:
         for line in f:
@@ -322,7 +324,7 @@ def test_setup_logging_configurations(tmp_path):
                     break
             except json.JSONDecodeError:
                 continue
-    
+
     # Test with custom date format
     date_file = tmp_path / "date_format.log"
     setup_logging(
@@ -333,7 +335,7 @@ def test_setup_logging_configurations(tmp_path):
     with open(date_file) as f:
         content = f.read()
         assert datetime.now().strftime("%Y-%m-%d") in content
-    
+
     # Test with rotation
     rotate_file = tmp_path / "rotate.log"
     setup_logging(
@@ -344,7 +346,8 @@ def test_setup_logging_configurations(tmp_path):
     logger.info("Rotation test start: \n ======================")
     # Write enough data to trigger rotation (1.5MB total)
     for i in range(150):
-        logger.info(f"Rotation test {i}: " + "x" * 1024 * 10)  # 10KB per log entry
+        logger.info(f"Rotation test {i}: " + "x" *
+                    1024 * 10)  # 10KB per log entry
         # Explicitly flush after each write to ensure rotation happens
         for handler in logger.handlers:
             if isinstance(handler, logging.FileHandler):
@@ -352,26 +355,31 @@ def test_setup_logging_configurations(tmp_path):
 
     # Verify rotation occurred
     assert os.path.exists(rotate_file), "Original log file should exist"
-    assert os.path.getsize(rotate_file) > 0, "Original log file should not be empty"
+    assert os.path.getsize(
+        rotate_file) > 0, "Original log file should not be empty"
 
     # Check for rotated files
     rotated_files = [f"{rotate_file}.{i}" for i in range(1, 4)]
-    assert any(os.path.exists(f) for f in rotated_files), "At least one rotated file should exist"
-    
+    assert any(os.path.exists(f)
+               for f in rotated_files), "At least one rotated file should exist"
+
     # Verify rotation sizes
     for rotated_file in rotated_files:
         if os.path.exists(rotated_file):
             rotated_size = os.path.getsize(rotated_file)
             assert rotated_size >= 1024 * 1024 * 0.9, (
-                f"Rotated file {rotated_file} should be at least 90% of 1MB, got {rotated_size} bytes"
+                f"Rotated file {rotated_file} should be at least 90% of 1MB, got {
+                    rotated_size} bytes"
             )
             assert rotated_size <= 1024 * 1024 * 1.1, (
-                f"Rotated file {rotated_file} should be at most 110% of 1MB, got {rotated_size} bytes"
+                f"Rotated file {rotated_file} should be at most 110% of 1MB, got {
+                    rotated_size} bytes"
             )
 
     # Verify backup count
-    assert sum(os.path.exists(f) for f in rotated_files) <= 3, "Should not exceed backup count"
-    
+    assert sum(os.path.exists(f)
+               for f in rotated_files) <= 3, "Should not exceed backup count"
+
     # Test console output
     setup_logging(console_output=True)
     with LogCapture() as capture:
@@ -384,27 +392,28 @@ def cleanup():
     """Clean up log files after tests"""
     # Store initial handlers
     initial_handlers = logging.getLogger().handlers[:]
-    
+
     yield
-    
+
     # Clean up any added handlers
     for handler in logging.getLogger().handlers[:]:
         if handler not in initial_handlers:
             handler.close()
             logging.getLogger().removeHandler(handler)
 
+
 def test_cleanup_fixture():
     """Test that the cleanup fixture removes handlers"""
     # Get initial handler count
     initial_count = len(logging.getLogger().handlers)
-    
+
     # Add a test handler
     test_handler = logging.StreamHandler()
     logging.getLogger().addHandler(test_handler)
-    
+
     # Verify handler was added
     assert len(logging.getLogger().handlers) == initial_count + 1
-    
+
     # The cleanup fixture should run after this test and remove the handler
 
 
@@ -415,12 +424,13 @@ def test_file_handler_edge_cases(tmp_path):
     get_logger(log_file=str(invalid_path))
     # If directory does not exist, it would be created automatically
     assert invalid_path.exists()
-    
+
     # Test read-only file
     read_only_file = tmp_path / "read_only.log"
     read_only_file.touch(mode=0o444)
     with pytest.raises(PermissionError):
         get_logger(log_file=str(read_only_file))
+
 
 def test_json_indentation_edge_cases(tmp_path):
     """Test JSON indentation edge cases"""
@@ -428,31 +438,32 @@ def test_json_indentation_edge_cases(tmp_path):
     log_file = tmp_path / "large_indent.log"
     logger = get_logger(json_format=True, indent=16, log_file=str(log_file))
     logger.info("Test message")
-    
+
     with open(log_file) as f:
         content = f.read()
         assert " " * 16 in content, "Should have 16-space indentation"
-    
+
     # Test zero indent with JSON
     log_file = tmp_path / "zero_indent.log"
     logger = get_logger(json_format=True, indent=0, log_file=str(log_file))
     logger.info("Test message")
-    
+
     with open(log_file) as f:
         content = f.read()
         assert "\n" in content, "Should have newlines even with zero indent"
         assert "  " not in content, "Should have no indentation spaces"
+
 
 def test_parameter_validation():
     """Test parameter validation edge cases"""
     # Test invalid log level
     with pytest.raises(ValueError):
         get_logger(log_level=999)  # Invalid log level number
-    
+
     # Test invalid date format
     with pytest.raises(ValueError):
         get_logger(date_format="INVALID_FORMAT")
-    
+
     # Test invalid log format
     with pytest.raises(ValueError):
         get_logger(log_format="INVALID_FORMAT")

@@ -4,6 +4,7 @@ from setlogging.logger import (
     CustomFormatter,
     setup_logging,
     get_logger,
+    get_tz_abbreviation
 )
 
 __version__ = "0.3.2"
