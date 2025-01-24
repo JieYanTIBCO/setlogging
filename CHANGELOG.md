@@ -1,3 +1,10 @@
+## [0.3.3](https://github.com/JieYanTIBCO/setlogging/compare/v0.3.2...v0.3.3) (2025-01-24)
+
+
+### Bug Fixes
+
+* add .gitignore and setlogging/logger.py to gitignore ([97708ea](https://github.com/JieYanTIBCO/setlogging/commit/97708eabc6242ee6d26d7481328a4a74572a5752))
+
 ## [0.3.2](https://github.com/JieYanTIBCO/setlogging/compare/v0.3.1...v0.3.2) (2025-01-22)
 
 
