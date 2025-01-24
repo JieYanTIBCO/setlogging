@@ -249,18 +249,20 @@ def get_config_message(
         }
         return json.dumps(config_dict)
     else:
+        # Max Size message
+        max_size_message = f"{max_size_mb:.2f} MB ({max_size_mb * 1024:.0f} KB)"
         return f"""
-╔{'═' * 61}╗
-║{'Logging Configuration'.center(61)}║
-╠{'═' * 61}╣
-║ Level        : {logging.getLevelName(log_level)[:45]:<45}║
-║ Log File     : {file_handler.baseFilename[:45]:<45}║
-║ Max Size     : {f"{max_size_mb:.2f} MB ({max_size_mb * 1024:.0f} KB)"[:45]:<45}║
-║ Backups      : {str(backup_count)[:45]:<45}║
-║ Console      : {str(console_output)[:45]:<45}║
-║ Timezone     : {str(LOCAL_TZINFO)[:45]:<45}║
-║ Process ID   : {str(processID)[:45]:<45}║
-╚{'═' * 61}╝
++{'-' * 60}+
+|{'Logging Configuration'.center(60)}|
++{'-' * 60}+
+| Level        : {logging.getLevelName(log_level):<44}|
+| Log File     : {file_handler.baseFilename:<44.44}|  
+| Max Size     : {max_size_message:<44.44}|
+| Backups      : {backup_count:<44}|
+| Console      : {str(console_output):<44}|
+| Timezone     : {str(LOCAL_TZINFO):<44}|
+| Process ID   : {processID:<44}|
++{'-' * 60}+
 """
 
 
