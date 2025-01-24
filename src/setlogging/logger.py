@@ -6,72 +6,54 @@ from logging.handlers import RotatingFileHandler
 import os
 from typing import Optional, Union
 
-TIMEZONE = datetime.now().astimezone().tzinfo
 
-# class TimezoneFormatter(logging.Formatter):
-#     """
-#     Custom formatter to include timezone-aware timestamps in log messages.
+def get_tz_abbreviation(dt_obj: datetime) -> str:
+    """Sanitize timezone name to standardized abbreviation (cross-platform compatible).
 
-#     Args:
-#         fmt: The format string for the log message
-#         datefmt: The format string for the timestamp
-#         timezone: Optional specific timezone to use (defaults to local)
+    Args:
+        dt_obj: Timezone-aware datetime object
 
-#     Example:
-#         formatter = TimezoneFormatter(
-#             fmt='%(asctime)s [%(timezone)s] %(levelname)s: %(message)s',
-#             datefmt='%Y-%m-%d %H:%M:%S'
-#         )
-#     """
+    Returns:
+        str: 3-letter timezone abbreviation (e.g., EST, PST)
+    """
+    tz_name = dt_obj.tzname()
+    if tz_name and " " in tz_name:  # Handle Windows full names
+        return "".join(word[0] for word in tz_name.split())
+    return tz_name or "UTC"  # Fallback for empty values
 
-#     def __init__(
-#         self,
-#         fmt: Optional[str] = None,
-#         datefmt: Optional[str] = None
-#     ) -> None:
-#         super().__init__(fmt, datefmt)
-#         self.local_timezone = TIMEZONE
 
-#     def formatTime(self, record: logging.LogRecord, datefmt: Optional[str] = None) -> str:
-#         try:
-#             local_dt = datetime.fromtimestamp(
-#                 record.created, self.local_timezone)
-#             if datefmt:
-#                 return local_dt.strftime(datefmt)
-#             else:
-#                 return local_dt.isoformat()
-#         except Exception as e:
-#             raise RuntimeError(f"Failed to format time: {str(e)}") from e
-
-#     def format(self, record: logging.LogRecord) -> str:
-#         # Add timezone name to log record
-#         record.timezone = str(self.local_timezone)
-#         return super().format(record)
+# Global timezone constants
+# tzinfo object for time calculations
+LOCAL_TZINFO = datetime.now().astimezone().tzinfo
+TIMEZONE_ABBREV = get_tz_abbreviation(
+    # Precomputed abbreviation for platform compatibility
+    datetime.now(LOCAL_TZINFO))
 
 
 class CustomFormatter(logging.Formatter):
-    def formatTime(self, record, datefmt):
+    """Log formatter with millisecond precision and timezone support."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._tz_abbrev = TIMEZONE_ABBREV  # Cache abbreviation for performance
+
+    def formatTime(self, record, datefmt=None) -> str:
+        """Enhanced time formatting with milliseconds and timezone.
+
+        Args:
+            record: LogRecord object
+            datefmt: Date format string (optional)
+
+        Returns:
+            str: Formatted timestamp with timezone
+        """
         try:
-            # Ensure datefmt is not None to avoid string concatenation errors
-            if datefmt is None:
-                datefmt = "%Y-%m-%d %H:%M:%S"  # Default time format
-
-            # Create a timezone-aware datetime object
-            tz_aware_time = datetime.fromtimestamp(record.created, tz=TIMEZONE)
-
-            # Format the time with milliseconds
-            formatted_time_with_ms = tz_aware_time.strftime(datefmt + ".%f")
-            # Truncate to 3 decimal places for milliseconds
-            formatted_time = formatted_time_with_ms[:-3]
-
-            # Get the timezone abbreviation (e.g., EST)
-            timezone_abbr = tz_aware_time.strftime("%Z")
-
-            # Combine the formatted time, milliseconds, and timezone
-            return f"{formatted_time} {timezone_abbr}"
-
-        except Exception as e:
-            # Fallback to the parent class's default time formatting in case of errors
+            base_fmt = datefmt or "%Y-%m-%d %H:%M:%S"
+            aware_time = datetime.fromtimestamp(record.created, LOCAL_TZINFO)
+            time_str = aware_time.strftime(f"{base_fmt}.%f")[
+                :-3]  # Truncate to milliseconds
+            return f"{time_str} {self._tz_abbrev}"
+        except Exception:
             return super().formatTime(record, datefmt)
 
 
@@ -244,7 +226,7 @@ def get_config_message(log_level, file_handler, max_size_mb, backup_count, conso
             "MaxFileSizeMB": max_size_mb,
             "BackupCount": backup_count,
             "ConsoleOutput": console_output,
-            "Timezone": str(TIMEZONE),
+            "Timezone": str(LOCAL_TZINFO),
             "ProcessID": processID
         }
         return json.dumps(config_dict)
@@ -258,7 +240,7 @@ Log File     : {file_handler.baseFilename}
 Max File Size: {max_size_mb:.2f} MB
 Backup Count : {backup_count}
 Console Out  : {console_output}
-Timezone     : {TIMEZONE}
+Timezone     : {LOCAL_TZINFO}
 ProcessID    : {processID}
 ===============================
 """
