@@ -6,7 +6,7 @@ from logging.handlers import RotatingFileHandler
 import os
 from typing import Optional, Union
 
-TIMEZONE=datetime.now().astimezone().tzinfo
+TIMEZONE = datetime.now().astimezone().tzinfo
 
 # class TimezoneFormatter(logging.Formatter):
 #     """
@@ -55,20 +55,21 @@ class CustomFormatter(logging.Formatter):
             # Ensure datefmt is not None to avoid string concatenation errors
             if datefmt is None:
                 datefmt = "%Y-%m-%d %H:%M:%S"  # Default time format
-            
+
             # Create a timezone-aware datetime object
             tz_aware_time = datetime.fromtimestamp(record.created, tz=TIMEZONE)
-            
+
             # Format the time with milliseconds
             formatted_time_with_ms = tz_aware_time.strftime(datefmt + ".%f")
-            formatted_time = formatted_time_with_ms[:-3]  # Truncate to 3 decimal places for milliseconds
-            
+            # Truncate to 3 decimal places for milliseconds
+            formatted_time = formatted_time_with_ms[:-3]
+
             # Get the timezone abbreviation (e.g., EST)
             timezone_abbr = tz_aware_time.strftime("%Z")
-            
+
             # Combine the formatted time, milliseconds, and timezone
             return f"{formatted_time} {timezone_abbr}"
-            
+
         except Exception as e:
             # Fallback to the parent class's default time formatting in case of errors
             return super().formatTime(record, datefmt)
@@ -108,7 +109,8 @@ def setup_logging(
             if indent < 0:
                 raise ValueError("indent must be non-negative")
             if not json_format:
-                raise ValueError("indent parameter is only valid when json_format is True")
+                raise ValueError(
+                    "indent parameter is only valid when json_format is True")
 
         # Validate log level
         valid_levels = {
@@ -116,19 +118,23 @@ def setup_logging(
             logging.ERROR, logging.CRITICAL
         }
         if log_level not in valid_levels:
-            raise ValueError(f"Invalid log level: {log_level}. Valid levels are: {valid_levels}")
-        
+            raise ValueError(f"Invalid log level: {
+                             log_level}. Valid levels are: {valid_levels}")
+
         # Validate the date_format
         if date_format:
             valid_codes = {"%Y", "%m", "%d", "%H", "%M", "%S", "%z", "%Z"}
             if not any(code in date_format for code in valid_codes):
-                raise ValueError(f"Invalid date_format: {date_format} must contain at least one format code (e.g., %Y, %m, %H)")
-            
+                raise ValueError(f"Invalid date_format: {
+                                 date_format} must contain at least one format code (e.g., %Y, %m, %H)")
+
         # Validate the log_format
         if log_format:
-            valid_codes = {"%(asctime)s", "%(levelname)s", "%(name)s", "%(message)s"}
+            valid_codes = {"%(asctime)s", "%(levelname)s",
+                           "%(name)s", "%(message)s"}
             if not any(code in log_format for code in valid_codes):
-                raise ValueError(f"Invalid log_format: {log_format} must contain at least one format code (e.g., %(asctime)s, %(levelname)s)")
+                raise ValueError(f"Invalid log_format: {
+                                 log_format} must contain at least one format code (e.g., %(asctime)s, %(levelname)s)")
 
         # Calculate max file size in bytes
         max_bytes = max_size_mb * 1024 * 1024
@@ -139,7 +145,8 @@ def setup_logging(
         # Create log directory if it does not exist
         log_dir = os.path.dirname(log_file)
         if log_dir:  # If log_dir is not empty
-            os.makedirs(log_dir, exist_ok=True)  # Create directory if it does not exist
+            # Create directory if it does not exist
+            os.makedirs(log_dir, exist_ok=True)
 
             # check if the directory is writable
             test_file = os.path.join(log_dir, ".permission_test")
@@ -148,18 +155,17 @@ def setup_logging(
                     f.write("test")
                 os.remove(test_file)
             except IOError as e:
-                raise PermissionError(f"Directory not writable: {log_dir}") from e
+                raise PermissionError(
+                    f"Directory not writable: {log_dir}") from e
 
         # Check if log file is writable
         if os.path.exists(log_file):
             if not os.access(log_file, os.W_OK):
                 raise PermissionError(f"File not writable: {log_file}")
-            
 
     except Exception as e:  # Catch permission errors
         raise
-    
-    
+
     try:
         # Create logger
         logger = logging.getLogger(__name__)
@@ -180,7 +186,7 @@ def setup_logging(
             formatter = CustomFormatter(
                 log_format or "%(asctime)s [%(levelname)s] [%(name)s] %(message)s",
                 date_format or "%Y-%m-%d %H:%M:%S"
-            )   
+            )
 
         # Set up file handler
         file_handler = RotatingFileHandler(
@@ -307,12 +313,14 @@ if __name__ == "__main__":
         logger = get_logger(console_output=True)
         logger.debug("Basic debug example")
         logger.info("Basic usage example")
+        logger.warning("Basic warning example")
+        logger.error("Basic error example")
+        logger.critical("Basic critical example")
         logger.info(datetime.now().astimezone().tzinfo)
         # JSON format example
         json_logger = get_logger(json_format=True, indent=2)
         json_logger.info("JSON format example")
 
-        
     except Exception as e:
         print(f"Error: {str(e)}")
         raise
