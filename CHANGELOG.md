@@ -1,3 +1,10 @@
+## [0.3.4](https://github.com/JieYanTIBCO/setlogging/compare/v0.3.3...v0.3.4) (2025-01-24)
+
+
+### Bug Fixes
+
+* Logging Configuration frame ([a18db8d](https://github.com/JieYanTIBCO/setlogging/commit/a18db8de511a505c5d48f52554b8f170f7394ebb))
+
 ## [0.3.3](https://github.com/JieYanTIBCO/setlogging/compare/v0.3.2...v0.3.3) (2025-01-24)
 
 
