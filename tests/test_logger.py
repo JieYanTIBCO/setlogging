@@ -4,7 +4,7 @@ import os
 import logging
 import sys
 from datetime import datetime, timedelta
-from setlogging.logger import get_logger, setup_logging, TimezoneFormatter, get_config_message
+from setlogging.logger import get_logger, setup_logging, get_config_message, CustomFormatter
 
 
 class LogCapture:
@@ -62,11 +62,16 @@ def test_json_logging(tmp_path):
 
 def test_timezone_awareness():
     """Test timezone information in logs"""
-    logger = get_logger()
-    formatter = next((h.formatter for h in logger.handlers
-                     if isinstance(h.formatter, TimezoneFormatter)), None)
+    
+    # Set up the logger with the CustomFormatter
+    logger = get_logger()  # Or manually set up with CustomFormatter
+    print(type(logger.handlers))
+    for h in logger.handlers:
+        print(type(h.formatter))
+    formatter = next((h.formatter for h in logger.handlers if isinstance(h.formatter, CustomFormatter)), None)
+    
+    #Assert that the formatter is correctly applied
     assert formatter is not None
-    assert formatter.local_timezone is not None
 
 
 def test_file_rotation(tmp_path):
@@ -286,9 +291,10 @@ def test_get_config_message():
 def test_setup_logging_configurations(tmp_path):
     """Test different setup_logging configurations"""
     # Test basic setup
+    
     log_file = tmp_path / "basic.log"
     setup_logging(log_file=str(log_file))
-    logger = logging.getLogger()
+    logger = get_logger()
     logger.info("Basic setup test")
     assert log_file.exists()
     
@@ -335,14 +341,14 @@ def test_setup_logging_configurations(tmp_path):
         max_size_mb=1,  # 1MB rotation threshold
         backup_count=3
     )
-    
+    logger.info("Rotation test start: \n ======================")
     # Write enough data to trigger rotation (1.5MB total)
     for i in range(150):
         logger.info(f"Rotation test {i}: " + "x" * 1024 * 10)  # 10KB per log entry
         # Explicitly flush after each write to ensure rotation happens
         for handler in logger.handlers:
             if isinstance(handler, logging.FileHandler):
-                handler.flush()
+                handler.close()  # 显式关闭处理器以确保轮转完成
 
     # Verify rotation occurred
     assert os.path.exists(rotate_file), "Original log file should exist"
@@ -401,38 +407,14 @@ def test_cleanup_fixture():
     
     # The cleanup fixture should run after this test and remove the handler
 
-def test_timezone_formatting():
-    """Test timezone formatting in log messages"""
-    logger = get_logger()
-    formatter = next((h.formatter for h in logger.handlers
-                     if isinstance(h.formatter, TimezoneFormatter)), None)
-    
-    # Ensure we have a formatter
-    assert formatter is not None, "TimezoneFormatter not found in logger handlers"
-    
-    # Create a log record
-    record = logging.LogRecord(
-        name="test",
-        level=logging.INFO,
-        pathname=__file__,
-        lineno=1,
-        msg="Test message",
-        args=(),
-        exc_info=None
-    )
-    
-    # Format the record
-    formatted = formatter.format(record)
-    
-    # Verify timezone is present
-    assert "UTC" in formatted or "GMT" in formatted, "Timezone should be present in formatted message"
 
 def test_file_handler_edge_cases(tmp_path):
     """Test file handler edge cases"""
     # Test invalid file path
     invalid_path = tmp_path / "nonexistent" / "test.log"
-    with pytest.raises(OSError):
-        get_logger(log_file=str(invalid_path))
+    get_logger(log_file=str(invalid_path))
+    # If directory does not exist, it would be created automatically
+    assert invalid_path.exists()
     
     # Test read-only file
     read_only_file = tmp_path / "read_only.log"

@@ -1,3 +1,17 @@
+## [0.3.2](https://github.com/JieYanTIBCO/setlogging/compare/v0.3.1...v0.3.2) (2025-01-22)
+
+
+### Bug Fixes
+
+* update python-publish.yml ([4d453d0](https://github.com/JieYanTIBCO/setlogging/commit/4d453d04a00a1acedd9b61c537c88f0a35c1ccd9))
+
+## [0.2.1](https://github.com/JieYanTIBCO/setlogging/compare/v0.2.0...v0.2.1) (2025-01-21)
+
+
+### Bug Fixes
+
+* timezone and ms in log ([4865490](https://github.com/JieYanTIBCO/setlogging/commit/4865490b69bf952a7bbc8ebb20ae3033ccf95190))
+
 # [0.2.0](https://github.com/JieYanTIBCO/setlogging/compare/v0.1.1...v0.2.0) (2025-01-13)
 
 

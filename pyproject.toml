@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "setlogging"
-version = "0.2.1"
+dynamic = ["version"]
 description = "A flexible logging utility with JSON support and timezone awareness"
 authors = [
     { name = "Jie Yan", email = "kiki3890528@gmail.com" }
 ]
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -25,21 +25,21 @@ Homepage = "https://github.com/JieYanTIBCO/setlogging"
 package-dir = { "setlogging" = "src/setlogging" }
 allow-direct-references = true
 
-[tool.hatch.build.targets.sdist]
+#[tool.hatch.build.targets.sdist]
 # include = [
 #     "src/setlogging/**",
 #     "README.md",
 #     "LICENSE",
 # ]
 
-[tool.hatch.build.targets.wheel]
+#[tool.hatch.build.targets.wheel]
 # include = [
 #     "src/setlogging/**",
 #     "README.md",
 #     "LICENSE",
 # ]
-
 
 [tool.hatch.version]
+source = "regex"
 path = "src/setlogging/__init__.py"
-pattern = "__version__ = \"{version}\""
+pattern = "^__version__\\s*=\\s*['\"](?P<version>[^'\"]+)['\"]"
