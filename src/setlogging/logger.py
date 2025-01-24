@@ -27,7 +27,8 @@ def get_tz_abbreviation(dt_obj: datetime) -> str:
 LOCAL_TZINFO = datetime.now().astimezone().tzinfo
 TIMEZONE_ABBREV = get_tz_abbreviation(
     # Precomputed abbreviation for platform compatibility
-    datetime.now(LOCAL_TZINFO))
+    datetime.now(LOCAL_TZINFO)
+)
 
 
 class CustomFormatter(logging.Formatter):
@@ -51,7 +52,8 @@ class CustomFormatter(logging.Formatter):
             base_fmt = datefmt or "%Y-%m-%d %H:%M:%S"
             aware_time = datetime.fromtimestamp(record.created, LOCAL_TZINFO)
             time_str = aware_time.strftime(f"{base_fmt}.%f")[
-                :-3]  # Truncate to milliseconds
+                :-3
+            ]  # Truncate to milliseconds
             return f"{time_str} {self._tz_abbrev}"
         except Exception:
             return super().formatTime(record, datefmt)
@@ -66,7 +68,7 @@ def setup_logging(
     log_format: Optional[str] = None,
     date_format: Optional[str] = None,
     json_format: bool = False,
-    indent: Optional[int] = None
+    indent: Optional[int] = None,
 ) -> logging.Logger:
     """
     Configure logging system with rotating file handler and optional console output.
@@ -92,31 +94,37 @@ def setup_logging(
                 raise ValueError("indent must be non-negative")
             if not json_format:
                 raise ValueError(
-                    "indent parameter is only valid when json_format is True")
+                    "indent parameter is only valid when json_format is True"
+                )
 
         # Validate log level
         valid_levels = {
-            logging.DEBUG, logging.INFO, logging.WARNING,
-            logging.ERROR, logging.CRITICAL
+            logging.DEBUG,
+            logging.INFO,
+            logging.WARNING,
+            logging.ERROR,
+            logging.CRITICAL,
         }
         if log_level not in valid_levels:
-            raise ValueError(f"Invalid log level: {
-                             log_level}. Valid levels are: {valid_levels}")
+            raise ValueError(
+                f"Invalid log level: {log_level}. Valid levels are: {valid_levels}"
+            )
 
         # Validate the date_format
         if date_format:
             valid_codes = {"%Y", "%m", "%d", "%H", "%M", "%S", "%z", "%Z"}
             if not any(code in date_format for code in valid_codes):
-                raise ValueError(f"Invalid date_format: {
-                                 date_format} must contain at least one format code (e.g., %Y, %m, %H)")
+                raise ValueError(
+                    f"Invalid date_format: {date_format} must contain at least one format code (e.g., %Y, %m, %H)"
+                )
 
         # Validate the log_format
         if log_format:
-            valid_codes = {"%(asctime)s", "%(levelname)s",
-                           "%(name)s", "%(message)s"}
+            valid_codes = {"%(asctime)s", "%(levelname)s", "%(name)s", "%(message)s"}
             if not any(code in log_format for code in valid_codes):
-                raise ValueError(f"Invalid log_format: {
-                                 log_format} must contain at least one format code (e.g., %(asctime)s, %(levelname)s)")
+                raise ValueError(
+                    f"Invalid log_format: {log_format} must contain at least one format code (e.g., %(asctime)s, %(levelname)s)"
+                )
 
         # Calculate max file size in bytes
         max_bytes = max_size_mb * 1024 * 1024
@@ -137,8 +145,7 @@ def setup_logging(
                     f.write("test")
                 os.remove(test_file)
             except IOError as e:
-                raise PermissionError(
-                    f"Directory not writable: {log_dir}") from e
+                raise PermissionError(f"Directory not writable: {log_dir}") from e
 
         # Check if log file is writable
         if os.path.exists(log_file):
@@ -158,21 +165,27 @@ def setup_logging(
 
         # Set up formatter
         if json_format:
-            formatter = logging.Formatter(json.dumps({
-                "time": "%(asctime)s",
-                "name": "%(name)s",
-                "level": "%(levelname)s",
-                "message": "%(message)s"
-            }, indent=indent))
+            formatter = logging.Formatter(
+                json.dumps(
+                    {
+                        "time": "%(asctime)s",
+                        "name": "%(name)s",
+                        "level": "%(levelname)s",
+                        "message": "%(message)s",
+                    },
+                    indent=indent,
+                )
+            )
         else:
             formatter = CustomFormatter(
                 log_format or "%(asctime)s [%(levelname)s] [%(name)s] %(message)s",
-                date_format or "%Y-%m-%d %H:%M:%S"
+                date_format or "%Y-%m-%d %H:%M:%S",
             )
 
         # Set up file handler
         file_handler = RotatingFileHandler(
-            log_file, maxBytes=max_bytes, backupCount=backup_count)
+            log_file, maxBytes=max_bytes, backupCount=backup_count
+        )
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
 
@@ -190,7 +203,7 @@ def setup_logging(
             backup_count=backup_count,
             console_output=console_output,
             json_format=json_format,  # Adapt the format based on user preference
-            indent=indent
+            indent=indent,
         )
 
         # Log configuration details with respect to log_level
@@ -203,10 +216,7 @@ def setup_logging(
                 logger.warning({"Logging Configuration": config_dict})
         else:
             if log_level != 0:
-                logger.log(log_level, (
-                    f"Logging Configuration:\n"
-                    f"{config_message}"
-                ))
+                logger.log(log_level, (f"Logging Configuration:\n" f"{config_message}"))
             else:
                 logger.warning(f"Logging Configuration:\n{config_message}")
 
@@ -216,7 +226,15 @@ def setup_logging(
         raise RuntimeError(f"Failed to set up logging: {str(e)}") from e
 
 
-def get_config_message(log_level, file_handler, max_size_mb, backup_count, console_output, json_format=False, indent=None):
+def get_config_message(
+    log_level,
+    file_handler,
+    max_size_mb,
+    backup_count,
+    console_output,
+    json_format=False,
+    indent=None,
+):
     processID = os.getpid()
 
     if json_format:
@@ -227,7 +245,7 @@ def get_config_message(log_level, file_handler, max_size_mb, backup_count, conso
             "BackupCount": backup_count,
             "ConsoleOutput": console_output,
             "Timezone": str(LOCAL_TZINFO),
-            "ProcessID": processID
+            "ProcessID": processID,
         }
         return json.dumps(config_dict)
     else:
@@ -256,7 +274,7 @@ def get_logger(
     log_format: Optional[str] = None,
     date_format: Optional[str] = None,
     json_format: bool = False,
-    indent: Optional[int] = None
+    indent: Optional[int] = None,
 ) -> logging.Logger:
     """
     Simplified function to set up logging and return a logger instance.
@@ -285,7 +303,7 @@ def get_logger(
         log_format=log_format,
         date_format=date_format,
         json_format=json_format,
-        indent=indent
+        indent=indent,
     )
 
 
