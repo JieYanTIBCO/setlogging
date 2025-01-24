@@ -47,3 +47,6 @@ node_modules/
 
 # powershell script
 *.ps1
+
+#
+htmlcov/
