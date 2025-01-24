@@ -2,9 +2,13 @@ import pytest
 import json
 import os
 import logging
-import sys
-from datetime import datetime, timedelta
-from setlogging.logger import get_logger, setup_logging, get_config_message, CustomFormatter, get_tz_abbreviation
+from datetime import datetime
+from setlogging.logger import (
+    get_logger,
+    setup_logging,
+    get_config_message,
+    CustomFormatter,
+)
 
 
 class LogCapture:
@@ -68,8 +72,14 @@ def test_timezone_awareness():
     print(type(logger.handlers))
     for h in logger.handlers:
         print(type(h.formatter))
-    formatter = next((h.formatter for h in logger.handlers if isinstance(
-        h.formatter, CustomFormatter)), None)
+    formatter = next(
+        (
+            h.formatter
+            for h in logger.handlers
+            if isinstance(h.formatter, CustomFormatter)
+        ),
+        None,
+    )
 
     # Assert that the formatter is correctly applied
     assert formatter is not None
@@ -81,9 +91,7 @@ def test_file_rotation(tmp_path):
     max_size_mb = 1  # 1MB
     backup_count = 3
     logger = get_logger(
-        log_file=str(log_file),
-        max_size_mb=max_size_mb,
-        backup_count=backup_count
+        log_file=str(log_file), max_size_mb=max_size_mb, backup_count=backup_count
     )
 
     # Write enough data to trigger rotation
@@ -138,11 +146,7 @@ def test_json_indent(tmp_path):
     # Test various indent values
     for indent in [None, 0, 2, 4]:
         log_file = tmp_path / f"test_indent_{indent}.json"
-        logger = get_logger(
-            json_format=True,
-            indent=indent,
-            log_file=str(log_file)
-        )
+        logger = get_logger(json_format=True, indent=indent, log_file=str(log_file))
 
         # Generate some log entries
         test_message = f"Test indent {indent}"
@@ -202,10 +206,7 @@ def test_custom_date_format(tmp_path):
     """Test custom date format"""
     log_file = tmp_path / "date_format.log"
     date_format = "%Y-%m-%d"
-    logger = get_logger(
-        log_file=str(log_file),
-        date_format=date_format
-    )
+    logger = get_logger(log_file=str(log_file), date_format=date_format)
     logger.info("Test message")
 
     with open(log_file) as f:
@@ -230,9 +231,9 @@ def test_custom_log_format():
         formatted_message = formatter.format(log_record)
 
         # Assert the formatted message matches the expected output
-        assert formatted_message == "INFO - Test message", (
-            f"Expected 'INFO - Test message' but got '{formatted_message}'"
-        )
+        assert (
+            formatted_message == "INFO - Test message"
+        ), f"Expected 'INFO - Test message' but got '{formatted_message}'"
 
 
 def test_multiple_handlers():
@@ -240,8 +241,7 @@ def test_multiple_handlers():
     logger = get_logger(console_output=True)
 
     # Ensure at least two handlers are present (e.g., console and file)
-    assert len(
-        logger.handlers) >= 2, "Expected at least 2 handlers (file and console)"
+    assert len(logger.handlers) >= 2, "Expected at least 2 handlers (file and console)"
 
     # Check handler types
     handler_types = [type(h) for h in logger.handlers]
@@ -253,6 +253,7 @@ def test_multiple_handlers():
 
 def test_get_config_message():
     """Test get_config_message helper function"""
+
     # Create a mock file handler
     class MockFileHandler:
         def __init__(self, filename):
@@ -265,7 +266,7 @@ def test_get_config_message():
         max_size_mb=10,
         backup_count=5,
         console_output=True,
-        json_format=True
+        json_format=True,
     )
     config_dict = json.loads(json_config)
     assert config_dict["Level"] == "INFO"
@@ -281,7 +282,7 @@ def test_get_config_message():
         max_size_mb=20,
         backup_count=3,
         console_output=False,
-        json_format=False
+        json_format=False,
     )
     assert "Logging Configuration" in text_config
     assert "DEBUG" in text_config
@@ -302,11 +303,7 @@ def test_setup_logging_configurations(tmp_path):
 
     # Test JSON format with indentation
     json_file = tmp_path / "json.log"
-    setup_logging(
-        log_file=str(json_file),
-        json_format=True,
-        indent=4
-    )
+    setup_logging(log_file=str(json_file), json_format=True, indent=4)
     test_message = "JSON format test"
     logger.info(test_message)
 
@@ -327,10 +324,7 @@ def test_setup_logging_configurations(tmp_path):
 
     # Test with custom date format
     date_file = tmp_path / "date_format.log"
-    setup_logging(
-        log_file=str(date_file),
-        date_format="%Y-%m-%d"
-    )
+    setup_logging(log_file=str(date_file), date_format="%Y-%m-%d")
     logger.info("Date format test")
     with open(date_file) as f:
         content = f.read()
@@ -341,13 +335,12 @@ def test_setup_logging_configurations(tmp_path):
     setup_logging(
         log_file=str(rotate_file),
         max_size_mb=1,  # 1MB rotation threshold
-        backup_count=3
+        backup_count=3,
     )
     logger.info("Rotation test start: \n ======================")
     # Write enough data to trigger rotation (1.5MB total)
     for i in range(150):
-        logger.info(f"Rotation test {i}: " + "x" *
-                    1024 * 10)  # 10KB per log entry
+        logger.info(f"Rotation test {i}: " + "x" * 1024 * 10)  # 10KB per log entry
         # Explicitly flush after each write to ensure rotation happens
         for handler in logger.handlers:
             if isinstance(handler, logging.FileHandler):
@@ -355,30 +348,31 @@ def test_setup_logging_configurations(tmp_path):
 
     # Verify rotation occurred
     assert os.path.exists(rotate_file), "Original log file should exist"
-    assert os.path.getsize(
-        rotate_file) > 0, "Original log file should not be empty"
+    assert os.path.getsize(rotate_file) > 0, "Original log file should not be empty"
 
     # Check for rotated files
     rotated_files = [f"{rotate_file}.{i}" for i in range(1, 4)]
-    assert any(os.path.exists(f)
-               for f in rotated_files), "At least one rotated file should exist"
+    assert any(
+        os.path.exists(f) for f in rotated_files
+    ), "At least one rotated file should exist"
 
     # Verify rotation sizes
     for rotated_file in rotated_files:
         if os.path.exists(rotated_file):
             rotated_size = os.path.getsize(rotated_file)
-            assert rotated_size >= 1024 * 1024 * 0.9, (
-                f"Rotated file {rotated_file} should be at least 90% of 1MB, got {
+            assert (
+                rotated_size >= 1024 * 1024 * 0.9
+            ), f"Rotated file {rotated_file} should be at least 90% of 1MB, got {
                     rotated_size} bytes"
-            )
-            assert rotated_size <= 1024 * 1024 * 1.1, (
-                f"Rotated file {rotated_file} should be at most 110% of 1MB, got {
+            assert (
+                rotated_size <= 1024 * 1024 * 1.1
+            ), f"Rotated file {rotated_file} should be at most 110% of 1MB, got {
                     rotated_size} bytes"
-            )
 
     # Verify backup count
-    assert sum(os.path.exists(f)
-               for f in rotated_files) <= 3, "Should not exceed backup count"
+    assert (
+        sum(os.path.exists(f) for f in rotated_files) <= 3
+    ), "Should not exceed backup count"
 
     # Test console output
     setup_logging(console_output=True)

@@ -1,10 +1,10 @@
 # Standard library imports
-from datetime import datetime, timezone as dt_timezone
+from datetime import datetime
 import json
 import logging
 from logging.handlers import RotatingFileHandler
 import os
-from typing import Optional, Union
+from typing import Optional
 
 
 def get_tz_abbreviation(dt_obj: datetime) -> str:
@@ -250,17 +250,17 @@ def get_config_message(
         return json.dumps(config_dict)
     else:
         return f"""
-===============================
-    Logging Configuration
-===============================
-Level        : {logging.getLevelName(log_level)}
-Log File     : {file_handler.baseFilename}
-Max File Size: {max_size_mb:.2f} MB
-Backup Count : {backup_count}
-Console Out  : {console_output}
-Timezone     : {LOCAL_TZINFO}
-ProcessID    : {processID}
-===============================
+╔{'═' * 61}╗
+║{'Logging Configuration'.center(61)}║
+╠{'═' * 61}╣
+║ Level        : {logging.getLevelName(log_level)[:45]:<45}║
+║ Log File     : {file_handler.baseFilename[:45]:<45}║
+║ Max Size     : {f"{max_size_mb:.2f} MB ({max_size_mb * 1024:.0f} KB)"[:45]:<45}║
+║ Backups      : {str(backup_count)[:45]:<45}║
+║ Console      : {str(console_output)[:45]:<45}║
+║ Timezone     : {str(LOCAL_TZINFO)[:45]:<45}║
+║ Process ID   : {str(processID)[:45]:<45}║
+╚{'═' * 61}╝
 """
 
 
