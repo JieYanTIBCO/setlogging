@@ -57,13 +57,14 @@ class CustomFormatter(logging.Formatter):
             return f"{time_str} {self._tz_abbrev}"
         except Exception:
             return super().formatTime(record, datefmt)
+        
 
 
 def setup_logging(
     log_level: int = logging.DEBUG,
     log_file: Optional[str] = None,
-    max_size_mb: int = 25,  # 25MB
-    backup_count: int = 7,
+    max_size_mb: Optional[int] = None,
+    backup_count: Optional[int] = None,
     console_output: bool = True,
     log_format: Optional[str] = None,
     date_format: Optional[str] = None,
@@ -75,7 +76,7 @@ def setup_logging(
 
     Args:
         log_level: Logging level (default: DEBUG)
-        log_file: Log file path (default: app.log or app_json.log if json_format is True)
+        log_file: Log file path (default: None)
         max_size_mb: Max log file size in MB before rotation (default: 25MB)
         backup_count: Number of backup files to keep (default: 7)
         console_output: Enable console logging (default: True)
@@ -85,9 +86,9 @@ def setup_logging(
         indent: Indentation level for JSON output (default: None)
     """
     try:
-        if max_size_mb <= 0:
+        if max_size_mb and max_size_mb <= 0:
             raise ValueError("max_size_mb must be positive")
-        if backup_count < 0:
+        if backup_count and backup_count < 0:
             raise ValueError("backup_count must be non-negative")
         if indent is not None:
             if indent < 0:
@@ -125,37 +126,14 @@ def setup_logging(
                 raise ValueError(
                     f"Invalid log_format: {log_format} must contain at least one format code (e.g., %(asctime)s, %(levelname)s)"
                 )
+        
 
-        # Calculate max file size in bytes
-        max_bytes = max_size_mb * 1024 * 1024
+        # Validate the log_file, if log_file and console are both False, raise an error
+        if not log_file and not console_output:
+            raise ValueError(
+                "At least one of log_file or console_output must be True"
+            )
 
-        # Set default log file if not provided
-        log_file = log_file or ("app_json.log" if json_format else "app.log")
-
-        # Create log directory if it does not exist
-        log_dir = os.path.dirname(log_file)
-        if log_dir:  # If log_dir is not empty
-            # Create directory if it does not exist
-            os.makedirs(log_dir, exist_ok=True)
-
-            # check if the directory is writable
-            test_file = os.path.join(log_dir, ".permission_test")
-            try:
-                with open(test_file, "w") as f:
-                    f.write("test")
-                os.remove(test_file)
-            except IOError as e:
-                raise PermissionError(f"Directory not writable: {log_dir}") from e
-
-        # Check if log file is writable
-        if os.path.exists(log_file):
-            if not os.access(log_file, os.W_OK):
-                raise PermissionError(f"File not writable: {log_file}")
-
-    except Exception as e:  # Catch permission errors
-        raise
-
-    try:
         # Create logger
         logger = logging.getLogger(__name__)
         logger.setLevel(log_level)
@@ -181,14 +159,55 @@ def setup_logging(
                 log_format or "%(asctime)s [%(levelname)s] [%(name)s] %(message)s",
                 date_format or "%Y-%m-%d %H:%M:%S",
             )
+        
+        # if log_file is not provided, need to handle file_handler, max_size_mb, backup_count, config_message
+        if not log_file:
+            # Validate the log_file, if log_file is not provided, max_size_mb and backup_count should be None
+            if max_size_mb or backup_count:
+                raise ValueError(
+                    "max_size_mb and backup_count should be None if log_file is not provided"
+                )
 
-        # Set up file handler
-        file_handler = RotatingFileHandler(
-            log_file, maxBytes=max_bytes, backupCount=backup_count
-        )
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+            # Set default log_file to None if not provided
+            log_file =  None
 
+            # Set up file handler as none
+            file_handler = None
+
+        # Check if log file is provided
+        else:
+            max_size_mb = max_size_mb if max_size_mb is not None else 25
+            backup_count = backup_count if backup_count is not None else 7
+            # Calculate max file size in bytes
+            max_bytes = max_size_mb * 1024 * 1024
+            # Create log directory if it does not exist
+            log_dir = os.path.dirname(log_file)
+            if log_dir:  # If log_dir is not empty
+                # Create directory if it does not exist
+                os.makedirs(log_dir, exist_ok=True)
+
+                # check if the directory is writable
+                test_file = os.path.join(log_dir, ".permission_test")
+                try:
+                    with open(test_file, "w") as f:
+                        f.write("test")
+                    os.remove(test_file)
+                except IOError as e:
+                    raise PermissionError(f"Directory not writable: {log_dir}") from e
+
+            # Check if log file is writable
+            if os.path.exists(log_file):
+                if not os.access(log_file, os.W_OK):
+                    raise PermissionError(f"File not writable: {log_file}")
+            
+            # Set up file handler
+            file_handler = RotatingFileHandler(
+                log_file, maxBytes=max_bytes, backupCount=backup_count
+            )
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+
+    
         # Set up console handler if enabled
         if console_output:
             console_handler = logging.StreamHandler()
@@ -202,7 +221,7 @@ def setup_logging(
             max_size_mb=max_size_mb,
             backup_count=backup_count,
             console_output=console_output,
-            json_format=json_format,  # Adapt the format based on user preference
+            json_format=json_format,
             indent=indent,
         )
 
@@ -222,9 +241,8 @@ def setup_logging(
 
         return logger
 
-    except Exception as e:
-        raise RuntimeError(f"Failed to set up logging: {str(e)}") from e
-
+    except Exception as e:  # Catch all errors
+        raise
 
 def get_config_message(
     log_level,
@@ -236,42 +254,64 @@ def get_config_message(
     indent=None,
 ):
     processID = os.getpid()
+    
 
     if json_format:
-        config_dict = {
-            "Level": logging.getLevelName(log_level),
-            "LogFile": file_handler.baseFilename,
-            "MaxFileSizeMB": max_size_mb,
-            "BackupCount": backup_count,
-            "ConsoleOutput": console_output,
-            "Timezone": str(LOCAL_TZINFO),
-            "ProcessID": processID,
-        }
-        return json.dumps(config_dict)
+        if file_handler:
+            config_dict = {
+                "Level": logging.getLevelName(log_level),
+                "LogFile": file_handler.baseFilename,
+                "MaxFileSizeMB": max_size_mb,
+                "BackupCount": backup_count,
+                "ConsoleOutput": console_output,
+                "Timezone": str(LOCAL_TZINFO),
+                "ProcessID": processID,
+            }
+            return json.dumps(config_dict)
+        else:
+            config_dict = {
+                "Level": logging.getLevelName(log_level),
+                "ConsoleOutput": console_output,
+                "Timezone": str(LOCAL_TZINFO),
+                "ProcessID": processID,
+            }
+            return json.dumps(config_dict)
     else:
-        # Max Size message
-        max_size_message = f"{max_size_mb:.2f} MB ({max_size_mb * 1024:.0f} KB)"
-        return f"""
-+{'-' * 60}+
-|{'Logging Configuration'.center(60)}|
-+{'-' * 60}+
-| Level        : {logging.getLevelName(log_level):<44}|
-| Log File     : {file_handler.baseFilename:<44.44}|  
-| Max Size     : {max_size_message:<44.44}|
-| Backups      : {backup_count:<44}|
-| Console      : {str(console_output):<44}|
-| Timezone     : {str(LOCAL_TZINFO):<44}|
-| Process ID   : {processID:<44}|
-+{'-' * 60}+
-"""
+        if file_handler:
+            # Max Size message
+            max_size_message = f"{max_size_mb:.2f} MB ({max_size_mb * 1024:.0f} KB)"
+            return f"""
+    +{'-' * 60}+
+    |{'Logging Configuration'.center(60)}|
+    +{'-' * 60}+
+    | Level        : {logging.getLevelName(log_level):<44}|
+    | Log File     : {file_handler.baseFilename:<44.44}|  
+    | Max Size     : {max_size_message:<44.44}|
+    | Backups      : {backup_count:<44}|
+    | Console      : {str(console_output):<44}|
+    | Timezone     : {str(LOCAL_TZINFO):<44}|
+    | Process ID   : {processID:<44}|
+    +{'-' * 60}+
+    """
+        else:
+            return f"""
+    +{'-' * 60}+
+    |{'Logging Configuration'.center(60)}|
+    +{'-' * 60}+
+    | Level        : {logging.getLevelName(log_level):<44}|
+    | Console      : {str(console_output):<44}|
+    | Timezone     : {str(LOCAL_TZINFO):<44}|
+    | Process ID   : {processID:<44}|
+    +{'-' * 60}+
+    """
 
 
 def get_logger(
     name: str = __name__,
     log_level: int = logging.DEBUG,
     log_file: Optional[str] = None,
-    max_size_mb: int = 25,  # 25MB
-    backup_count: int = 7,
+    max_size_mb: Optional[int] = None,
+    backup_count: Optional[int] = None,
     console_output: bool = True,
     log_format: Optional[str] = None,
     date_format: Optional[str] = None,
@@ -299,7 +339,7 @@ def get_logger(
     return setup_logging(
         log_level=log_level,
         log_file=log_file,
-        max_size_mb=max_size_mb,  # Pass max_size_mb parameter
+        max_size_mb=max_size_mb,
         backup_count=backup_count,
         console_output=console_output,
         log_format=log_format,
@@ -312,13 +352,17 @@ def get_logger(
 # Example Usage
 if __name__ == "__main__":
     try:
-        logger = get_logger(console_output=True)
+        # Basic example
+        logger = get_logger(
+            log_file="./logs/app.log",
+            console_output=True)
         logger.debug("Basic debug example")
         logger.info("Basic usage example")
         logger.warning("Basic warning example")
         logger.error("Basic error example")
         logger.critical("Basic critical example")
         logger.info(datetime.now().astimezone().tzinfo)
+
         # JSON format example
         json_logger = get_logger(json_format=True, indent=2)
         json_logger.info("JSON format example")
