@@ -1,3 +1,10 @@
+## [0.3.5](https://github.com/JieYanTIBCO/setlogging/compare/v0.3.4...v0.3.5) (2025-02-01)
+
+
+### Bug Fixes
+
+* remove LICENSE.txt and update LICENSE ([57f1f86](https://github.com/JieYanTIBCO/setlogging/commit/57f1f86825e363799d2b854e7bf9b262decb3a09))
+
 ## [0.3.4](https://github.com/JieYanTIBCO/setlogging/compare/v0.3.3...v0.3.4) (2025-01-24)
 
 
