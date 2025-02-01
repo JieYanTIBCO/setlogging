@@ -15,7 +15,7 @@ A flexible Python logging utility with JSON support and timezone awareness.
 
 - JSON and plain text log formats
 - Log file rotation with size limits
-- Console output options
+- Console and logfile output options
 - Timezone-aware logging
 - Customizable formatting
 - Type-safe configuration
@@ -46,8 +46,8 @@ logger = get_logger(
     backup_count=5
 )
 
-# Disable console output
-logger = get_logger(console_output=False)
+# Disable console output with log file
+logger = get_logger(console_output=False, logfile="./logs/app.log")
 logger.info("This will not be printed to the console")
 ```
 

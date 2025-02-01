@@ -274,7 +274,9 @@ def main():
     log_format = "INVALID_FORMAT"
     # Cleanup
     # cleanup_temp_path()
-    get_logger(console_output=False, log_file=None)
+    #get_logger(console_output=False, log_file=None)
+    logging = get_logger(console_output=False, log_file="./logs/app.log")
+    logging.info("This will not be printed to the console")
 
 
 if __name__ == "__main__":
