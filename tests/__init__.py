@@ -1,6 +1,6 @@
 # src/setlogging/__init__.py
 
-from setlogging.logger import CustomFormatter, setup_logging, get_logger
+from src.setlogging.logger import CustomFormatter, setup_logging, get_logger
 
 __version__ = "0.3.2"
 __author__ = "Jie Yan"

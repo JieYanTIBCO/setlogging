@@ -3,7 +3,7 @@ import json
 import os
 import logging
 from datetime import datetime
-from setlogging.logger import (
+from src.setlogging.logger import (
     get_logger,
     setup_logging,
     get_config_message,
@@ -235,19 +235,28 @@ def test_custom_log_format():
         ), f"Expected 'INFO - Test message' but got '{formatted_message}'"
 
 
-def test_multiple_handlers():
-    """Test multiple handlers configuration"""
+def test_console_only():
+    """Test console-only logging"""
     logger = get_logger(console_output=True)
 
-    # Ensure at least two handlers are present (e.g., console and file)
-    assert len(logger.handlers) >= 2, "Expected at least 2 handlers (file and console)"
+    # check if the logger has a console handler
+    assert any(isinstance(h, logging.StreamHandler) for h in logger.handlers)
 
-    # Check handler types
-    handler_types = [type(h) for h in logger.handlers]
-    assert logging.StreamHandler in handler_types, "StreamHandler (console) is missing"
-    assert any(
-        issubclass(h, logging.FileHandler) for h in handler_types
-    ), "No FileHandler or RotatingFileHandler found in logger handlers"
+    # check if the logger has no file handler
+    assert not any(isinstance(h, logging.FileHandler) for h in logger.handlers)
+
+    # check if the logger has a custom formatter
+    assert any(isinstance(h.formatter, CustomFormatter) for h in logger.handlers)
+
+def test_no_console_no_file():
+    """
+    Test that console output and file output are not both enabled
+    """
+    with pytest.raises(ValueError):
+        get_logger(console_output=False, log_file=None)
+
+
+
 
 
 def test_get_config_message():

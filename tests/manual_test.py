@@ -1,9 +1,12 @@
 import shutil
 from pathlib import Path
-from setlogging.logger import get_logger
 import json
 import logging
-from setlogging.logger import CustomFormatter, setup_logging
+from src.setlogging.logger import (
+    get_logger,
+    setup_logging,
+    CustomFormatter,
+)
 
 
 # Define a global temp_path for storing log files
@@ -271,6 +274,7 @@ def main():
     log_format = "INVALID_FORMAT"
     # Cleanup
     # cleanup_temp_path()
+    get_logger(console_output=False, log_file=None)
 
 
 if __name__ == "__main__":
