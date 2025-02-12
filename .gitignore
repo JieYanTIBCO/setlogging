@@ -54,3 +54,6 @@ htmlcov/
 
 #project idea, enhancement and bug tracking
 .idea/
+
+# .coverage files
+.coverage
