@@ -275,8 +275,11 @@ def main():
     # Cleanup
     # cleanup_temp_path()
     #get_logger(console_output=False, log_file=None)
-    logging = get_logger(console_output=False, log_file="./logs/app.log")
-    logging.info("This will not be printed to the console")
+    logging = get_logger(console_output=True, log_file="app.log")
+    logging.info("Test info level printing")
+    logging.debug("Test debug level printing")
+    logging.warning("Test warning level printing")
+    logging.error("Test error level printing")
 
 
 if __name__ == "__main__":
