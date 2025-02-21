@@ -57,3 +57,4 @@ htmlcov/
 
 # .coverage files
 .coverage
+temp/
