@@ -1,3 +1,10 @@
+## [0.4.2](https://github.com/JieYanTIBCO/setlogging/compare/v0.4.1...v0.4.2) (2025-02-21)
+
+
+### Bug Fixes
+
+* add .gitignore and pyproject.toml ([5b4859a](https://github.com/JieYanTIBCO/setlogging/commit/5b4859ae7012df393af7c2f82072c34b41f1aed1))
+
 ## [0.4.1](https://github.com/JieYanTIBCO/setlogging/compare/v0.4.0...v0.4.1) (2025-02-21)
 
 
