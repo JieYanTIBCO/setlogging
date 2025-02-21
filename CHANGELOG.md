@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/JieYanTIBCO/setlogging/compare/v0.4.0...v0.4.1) (2025-02-21)
+
+
+### Bug Fixes
+
+* site-packages location ([5b4cf4d](https://github.com/JieYanTIBCO/setlogging/commit/5b4cf4d8d403c292d9bb7ac6a11db2cafb8cdcc5))
+
 # [0.4.0](https://github.com/JieYanTIBCO/setlogging/compare/v0.3.5...v0.4.0) (2025-02-21)
 
 
