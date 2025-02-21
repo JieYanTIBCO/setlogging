@@ -1,3 +1,10 @@
+## [0.4.3](https://github.com/JieYanTIBCO/setlogging/compare/v0.4.2...v0.4.3) (2025-02-21)
+
+
+### Bug Fixes
+
+* update pyproject.toml ([371c22f](https://github.com/JieYanTIBCO/setlogging/commit/371c22fcddbd7a6e0f31203265024f1b3c562db2))
+
 ## [0.4.2](https://github.com/JieYanTIBCO/setlogging/compare/v0.4.1...v0.4.2) (2025-02-21)
 
 
