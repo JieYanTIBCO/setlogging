@@ -1,3 +1,16 @@
+# [0.4.0](https://github.com/JieYanTIBCO/setlogging/compare/v0.3.5...v0.4.0) (2025-02-21)
+
+
+### Bug Fixes
+
+* readme format, before cline to fix cicd ([cd8f28b](https://github.com/JieYanTIBCO/setlogging/commit/cd8f28b3b243032d410455a46bcf75beb2b3a8a9))
+* update python-publish.yml revert it back ([a2963c1](https://github.com/JieYanTIBCO/setlogging/commit/a2963c1949160405055e695dcc6fe0c616af2b1c))
+
+
+### Features
+
+* add release.config.js ([4133bf5](https://github.com/JieYanTIBCO/setlogging/commit/4133bf5c9ae5cee18f00f5824869bad525d95c73))
+
 ## [0.3.5](https://github.com/JieYanTIBCO/setlogging/compare/v0.3.4...v0.3.5) (2025-02-01)
 
 
